@@ -12,6 +12,11 @@ metadata:
   namespace: {{ .Values.dataScienceProjectNamespace }}
   labels:
     opendatahub.io/dashboard: 'true'
+{{- if .Values.model.additionalLabels }}
+{{- range $key, $value := .Values.model.additionalLabels }}
+    {{ $key }}: "{{ $value }}"
+{{- end }}
+{{- end }}
 spec:
   predictor:
     maxReplicas: {{ .Values.model.maxReplicas }}
@@ -52,6 +57,7 @@ metadata:
     openshift.io/display-name: "{{ .Values.model.displayName }}"
     opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
   name: {{ .Values.model.name }}
+  namespace: {{ .Values.dataScienceProjectNamespace }}
   labels:
     opendatahub.io/dashboard: 'true'
 spec:
@@ -75,6 +81,15 @@ spec:
         - '--distributed-executor-backend=mp'
         {{- if .Values.model.embeddingsModel }}
         - '--task embed'
+        {{- end }}
+        # https://docs.vllm.ai/en/latest/features/tool_calling.html#ibm-granite
+        {{- if .Values.model.toolCallParser }}
+        - '--tool-call-parser'
+        - '{{ .Values.model.toolCallParser }}'
+        {{- end }}
+        {{- if .Values.model.chatTemplate }}
+        - '--chat-template'
+        - '{{ .Values.model.chatTemplate }}'
         {{- end }}
       command:
         - python

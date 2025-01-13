@@ -13,18 +13,19 @@ spec:
   template:
     spec:
       containers:
-        - args:
+        - name: create-ds-connections
+          envFrom:
+            - secretRef:
+                name: aws-connection-{{ .Values.modelConnection.name }}  # Secret with S3 bucket credentials
+            - secretRef:
+                name: hf-creds  # Secret with HuggingFace credentials
+          env:
+            - name: AWS_S3_ENDPOINT_SCHEME
+              value: {{ .Values.modelConnection.scheme }}
+          args:
             - -ec
             - |-
-              echo -n 'Waiting for hf-creds secret'
-              while ! oc get secret hf-creds 2>/dev/null; do
-                echo -n .
-                sleep 5
-              done; echo
-
               MODELS_MOUNT_PATH=/mnt/models              
-              HF_USERNAME=$(oc get secret hf-creds -o jsonpath='{.data.HF_USERNAME}' | base64 -d)
-              HF_TOKEN=$(oc get secret hf-creds -o jsonpath='{.data.HF_TOKEN}' | base64 -d)
               MODEL_ROOT="{{ .Values.model.root }}"
               MODEL_ID="{{ .Values.model.id }}"
 
@@ -34,51 +35,37 @@ spec:
                   exit 1
               fi
 
-
               huggingface-cli download ${MODEL_ROOT}/${MODEL_ID} --token ${HF_TOKEN} \
                 --cache-dir ${MODELS_MOUNT_PATH}/.cache \
                 --local-dir ${MODELS_MOUNT_PATH}/${MODEL_ROOT}/${MODEL_ID}
 
               # Set up AWS CLI
-              AWS_CONFIG_FILE=/scratch/aws-config
-              AWS_S3_BUCKET={{ .Values.modelConnection.awsS3Bucket }}
-              AWS_ACCESS_KEY_ID={{ .Values.modelConnection.awsAccessKeyId }}
-              AWS_SECRET_ACCESS_KEY={{ .Values.modelConnection.awsSecretAccessKey }}
-              AWS_DEFAULT_REGION={{ .Values.modelConnection.awsDefaultRegion }}
-              AWS_S3_ENDPOINT={{ .Values.modelConnection.awsS3Endpoint }}
-              AWS_S3_CUSTOM_DOMAIN=${AWS_S3_ENDPOINT}
+              export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+              export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+              export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
               AWS_S3_USE_PATH_STYLE=1
-
-              cat << EOF > ${AWS_CONFIG_FILE}
-              [default]
-              aws_access_key_id = ${AWS_ACCESS_KEY_ID}
-              aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
-              region = ${AWS_DEFAULT_REGION}
-              EOF
 
               # Check if the bucket exists and create it if it doesn't
               echo ">>>>>> Checking if S3 bucket exists..."
-              if aws s3api head-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}" 2>&1 | grep -q "Not Found"; then
+              if aws s3api head-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "${AWS_S3_ENDPOINT}" 2>&1 | grep -q "Not Found"; then
                   echo "Bucket ${AWS_S3_BUCKET} does not exist. Creating..."
-                  aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}"
+                  aws s3api create-bucket --bucket ${AWS_S3_BUCKET} --endpoint-url "${AWS_S3_ENDPOINT}"
               else
                   echo "Bucket ${AWS_S3_BUCKET} already exists. Continuing..."
               fi
 
               # Upload the model to the bucket excluding safetensor files
               echo ">>>>>> Uploading model to AWS_S3_BUCKET ${AWS_S3_BUCKET}"
-              aws s3 sync ${MODELS_MOUNT_PATH}/${MODEL_ROOT}/${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --exclude ".git/*" --exclude ".git" --endpoint-url "{{ .Values.modelConnection.scheme }}://${AWS_S3_ENDPOINT}" 
+              aws s3 sync ${MODELS_MOUNT_PATH}/${MODEL_ROOT}/${MODEL_ID} s3://${AWS_S3_BUCKET}/${MODEL_ROOT}/${MODEL_ID}/ --exclude ".git/*" --exclude ".git" --endpoint-url "${AWS_S3_ENDPOINT}" 
           command:
             - /bin/bash
           image: {{ .Values.setup.image }}
           imagePullPolicy: Always
-          name: create-ds-connections
           volumeMounts:
             - name: models-volume
               mountPath: /mnt/models
       restartPolicy: Never
-      serviceAccount: setup-job
-      serviceAccountName: setup-job
+      serviceAccountName: default
       volumes:
         - name: models-volume
           persistentVolumeClaim:
