@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db
+  labels:
+    component: db
+  {{- include "model-registry.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.registryDb.replicas }}
+  revisionHistoryLimit: {{ .Values.registryDb.revisionHistoryLimit }}
+  strategy:
+    type: {{ .Values.registryDb.strategy.type | quote }}
+  selector:
+    matchLabels:
+      component: db
+    {{- include "model-registry.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        component: db
+      {{- include "model-registry.selectorLabels" . | nindent 8 }}
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - args: {{- toYaml .Values.registryDb.dbContainer.args | nindent 8 }}
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db-parameters
+        - secretRef:
+            name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db-secrets
+        image: {{ .Values.registryDb.dbContainer.image.repository }}:{{ .Values.registryDb.dbContainer.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.registryDb.dbContainer.imagePullPolicy }}
+        name: db-container
+        ports:
+        - containerPort: 3306
+          name: dbapi
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - mysql -D $$MYSQL_DATABASE -u$$MYSQL_USER_NAME -p$$MYSQL_ROOT_PASSWORD -e 'SELECT
+              1'
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: metadata-mysql
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: metadata-mysql
+        persistentVolumeClaim:
+          claimName: {{ include "model-registry.fullname" . }}-metadata-mysql

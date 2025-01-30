@@ -1,3 +1,8 @@
 tmp/
 *.old
 old/
+temp.*
+*creds.*
+.env
+*.tmp
+.DS_Store

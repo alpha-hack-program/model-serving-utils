@@ -27,7 +27,7 @@ spec:
     namespace: granite-8b # DATA_SCIENCE_PROJECT_NAMESPACE used later
   source:
     path: gitops/model
-    repoURL: https://github.com/alpha-hack-program/doc-bot.git
+    repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
     targetRevision: main
     helm:
       parameters:
@@ -126,6 +126,9 @@ spec:
     server: 'https://kubernetes.default.svc'
   project: default
   source:
+    path: gitops/model
+    repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
+    targetRevision: main
     helm:
       parameters:
         - name: createNamespace # This has to be false if deploying in the an existing namespace
@@ -135,7 +138,7 @@ spec:
         - name: instanceName
           value: llama-3-8b
         - name: dataScienceProjectNamespace
-          value: llama-3-8b # DATA_SCIENCE_PROJECT_NAMESPACE used later
+          value: llama-3-8b
         - name: dataScienceProjectDisplayName
           value: Project llama-3-8b
         - name: model.root
@@ -170,9 +173,6 @@ spec:
           value: models
         - name: modelConnection.awsS3Endpoint
           value: 'minio.ic-shared-minio.svc:9000'
-    path: gitops/model
-    repoURL: 'https://github.com/alpha-hack-program/doc-bot.git'
-    targetRevision: main
   syncPolicy:
     automated:
       selfHeal: true
