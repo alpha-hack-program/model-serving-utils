@@ -33,12 +33,11 @@ spec:
             name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db-parameters
         - secretRef:
             name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db-secrets
-        image: {{ .Values.registryDb.dbContainer.image.repository }}:{{ .Values.registryDb.dbContainer.image.tag
-          | default .Chart.AppVersion }}
+        image: {{ .Values.registryDb.dbContainer.image.repository }}:{{ .Values.registryDb.dbContainer.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.registryDb.dbContainer.imagePullPolicy }}
         name: db-container
         ports:
-        - containerPort: 3306
+        - containerPort: {{ .Values.registryDb.databasePort | default 3306 }}
           name: dbapi
           protocol: TCP
         readinessProbe:

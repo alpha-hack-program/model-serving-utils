@@ -48,7 +48,7 @@ spec:
     host: registry-db.rhoai-model-registries.svc.cluster.local
     passwordSecret:
       key: database-password
-      name: registry-db
+      name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db
     port: 3306
     skipDBCreation: false
     username: root
