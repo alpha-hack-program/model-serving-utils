@@ -1,7 +1,6 @@
 kubernetesClusterDomain: cluster.local
 
 registry:
-  name: users
   namespace: rhoai-model-registries
   grpc:
     image: registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8@sha256:927a88bade78e121d84e4d072f07a203fb00173af3615e00ce712d45329dde2d

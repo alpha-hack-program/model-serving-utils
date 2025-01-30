@@ -45,7 +45,7 @@ spec:
     tlsMode: ISTIO_MUTUAL
   mysql:
     database: metadb
-    host: registry-db.rhoai-model-registries.svc.cluster.local
+    host: {{ include "model-registry.fullname" . }}-db.rhoai-model-registries.svc.cluster.local
     passwordSecret:
       key: database-password
       name: {{ include "model-registry.fullname" . }}-db
