@@ -7,7 +7,7 @@ metadata:
   {{- include "model-registry.labels" . | nindent 4 }}
   annotations:
     openshift.io/description: ""
-    openshift.io/display-name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}
+    openshift.io/display-name: {{ include "model-registry.fullname" . }}
 spec:
   grpc:
     image: {{ .Values.registry.grpc.image | default "quay.io/opendatahub/model-registry:v0.2.12" }}
@@ -48,7 +48,7 @@ spec:
     host: registry-db.rhoai-model-registries.svc.cluster.local
     passwordSecret:
       key: database-password
-      name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db
+      name: {{ include "model-registry.fullname" . }}-db
     port: {{ .Values.registryDb.databasePort | default 3306 }}
     skipDBCreation: false
     username: root

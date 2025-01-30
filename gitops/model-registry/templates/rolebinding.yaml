@@ -1,13 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}
+  name: {{ include "model-registry.fullname" . }}
   labels:
-    app: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}
-    app.kubernetes.io/component: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}
-    app.kubernetes.io/created-by: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-operator
-    app.kubernetes.io/part-of: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}
-    component: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}
+    app: {{ include "model-registry.fullname" . }}
+    app.kubernetes.io/component: {{ include "model-registry.fullname" . }}
+    app.kubernetes.io/created-by: {{ include "model-registry.fullname" . }}-operator
+    app.kubernetes.io/part-of: {{ include "model-registry.fullname" . }}
+    component: {{ include "model-registry.fullname" . }}
   {{- include "model-registry.labels" . | nindent 4 }}
   annotations:
     openshift.io/description: Can access Model Registry registry
@@ -16,7 +16,7 @@ rules:
 - apiGroups:
   - ""
   resourceNames:
-  - {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}
+  - {{ include "model-registry.fullname" . }}
   resources:
   - services
   verbs:
@@ -36,7 +36,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}
+  name: {{ include "model-registry.fullname" . }}
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group

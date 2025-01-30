@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db
+  name: {{ include "model-registry.fullname" . }}-db
   namespace: {{ .Values.registry.namespace }}
   labels:
     component: db
@@ -33,9 +33,9 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         envFrom:
         - configMapRef:
-            name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db-parameters
+            name: {{ include "model-registry.fullname" . }}-db-parameters
         - secretRef:
-            name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db-secrets
+            name: {{ include "model-registry.fullname" . }}-db-secrets
         image: {{ .Values.registryDb.dbContainer.image.repository }}:{{ .Values.registryDb.dbContainer.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.registryDb.dbContainer.imagePullPolicy }}
         name: db-container
