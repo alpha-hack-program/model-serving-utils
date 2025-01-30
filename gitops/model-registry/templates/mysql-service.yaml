@@ -12,4 +12,7 @@ spec:
     component: db
     {{- include "model-registry.selectorLabels" . | nindent 4 }}
   ports:
-  {{- .Values.registryDb.ports | toYaml | nindent 2 }}
+  - name: dbapi
+    port: {{ .Values.registryDb.databasePort | default 3306 }}
+    protocol: TCP
+    targetPort: 3306

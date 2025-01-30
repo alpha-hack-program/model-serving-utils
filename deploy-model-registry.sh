@@ -33,7 +33,6 @@ spec:
     targetRevision: main
     helm:
       values: |
-        dataScienceProjectNamespace: ${NAMESPACE_NAME}
         registry:
           name: ${MODEL_REGISTRY_NAME}
         registryDb:

@@ -24,7 +24,10 @@ spec:
         sidecar.istio.io/inject: "false"
     spec:
       containers:
-      - args: {{- toYaml .Values.registryDb.dbContainer.args | nindent 8 }}
+      - args:
+          - --datadir
+          - /var/lib/mysql/datadir
+          - --default-authentication-plugin=mysql_native_password
         env:
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}

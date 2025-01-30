@@ -21,19 +21,10 @@ pvc:
 registryDb:
   allowEmptyPassword: "true"
   dbContainer:
-    args:
-    - --datadir
-    - /var/lib/mysql/datadir
-    - --default-authentication-plugin=mysql_native_password
     image:
       repository: mysql
       tag: 8.0.3
     imagePullPolicy: IfNotPresent
-  ports:
-  - name: dbapi
-    port: 3306
-    protocol: TCP
-    targetPort: 3306
   replicas: 1
   revisionHistoryLimit: 10
   strategy:
