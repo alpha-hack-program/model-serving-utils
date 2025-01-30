@@ -1,7 +1,7 @@
 apiVersion: modelregistry.opendatahub.io/v1alpha1
 kind: ModelRegistry
 metadata:
-  name: {{ include "model-registry.fullname" . }}-{{ required "registry.name is required" .Values.registry.name }}
+  name: {{ include "model-registry.fullname" . }}
   namespace: {{ .Values.registry.namespace }}
   labels:
   {{- include "model-registry.labels" . | nindent 4 }}
