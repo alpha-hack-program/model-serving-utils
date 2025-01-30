@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "model-registry.fullname" . }}-{{ .Values.registry.name }}-db
+  namespace: {{ .Values.registry.namespace }}
   labels:
     component: db
   {{- include "model-registry.labels" . | nindent 4 }}
