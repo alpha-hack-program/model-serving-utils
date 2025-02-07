@@ -5,6 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "2"
     openshift.io/display-name: "{{ .Values.model.displayName }}"
+    security.opendatahub.io/enable-auth: '{{ .Values.model.enableAuth }}'
     serving.knative.openshift.io/enablePassthrough: 'true'
     sidecar.istio.io/inject: 'true'
     sidecar.istio.io/rewriteAppHTTPProbers: 'true'

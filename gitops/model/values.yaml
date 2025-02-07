@@ -15,6 +15,7 @@ model:
   maxModelLen: '6144'
   apiProtocol: REST
   embeddingsModel: false
+  enableAuth: false
   runtime:
     templateName: vllm-serving-template
     templateDisplayName: vLLM Serving Template

@@ -4,10 +4,24 @@
 set -a
 . .env
 
-# Arguments: [llama|granite] [8b] [3.0|3.1|3.2]
-if [ "$#" -ne 3 ]; then
-  echo "Usage: deploy-model.sh [llama|granite] [8b] [3.0|3.1|3.2]"
+# Check arguments, anableAuth is optional
+# Arguments: [llama|granite] [8b] [3.0|3.1|3.2] <enableAuth>
+if [ "$#" -lt 3 ]; then
+  echo "Usage: $0 [llama|granite] [8b] [3.0|3.1|3.2] <enableAuth>"
   exit 1
+fi
+
+# If enableAuth is not provided, set it to false
+if [ "$#" -eq 3 ]; then
+  ENABLE_AUTH="false"
+else
+  # If the 4th argument is exactly enableAuth, set it to true, else fail and exit
+  if [ "$4" = "enableAuth" ]; then
+    ENABLE_AUTH="true"
+  else
+    echo "Usage: $0 [llama|granite] [8b] [3.0|3.1|3.2] <enableAuth>"
+    exit 1
+  fi
 fi
 
 # If file hf-creds.yaml doesn't exist, fail and exit
@@ -28,7 +42,7 @@ MODEL_VERSION="$3"
 # Compose model name
 MODEL_NAME="${MODEL_FAMILY}-${MODEL_SIZE}-${MODEL_VERSION}"
 
-# Componse namespace name
+# Compose namespace name
 NAMESPACE_NAME="${MODEL_FAMILY}-${MODEL_SIZE}"
 
 # If model family is granite, set the model.root to ibm-granite
@@ -89,11 +103,13 @@ spec:
         - name: model.root
           value: ${MODEL_ROOT}
         - name: model.id
-          value: ${MODEL_NAME}-instruct
+          value: ${MODEL_ID}
         - name: model.name
           value: ${MODEL_NAME}
         - name: model.displayName
           value: "${MODEL_FAMILY} ${MODEL_SIZE} Instruct"
+        - name: model.enableAuth
+          value: "${ENABLE_AUTH}"
         - name: model.maxModelLen
           value: '4096'
         - name: model.runtime.displayName
