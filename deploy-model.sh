@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Error if no .env file is found
+if [ ! -f .env ]; then
+  echo "File .env not found. Use .env.example as a template"
+  exit 1
+fi
+
 # Load .env file
 set -a
 . .env
@@ -122,10 +128,14 @@ spec:
           value: '1'
         - name: model.accelerator.max
           value: '1'
+        - name: modelConnection.awsAccessKeyId
+          value: ${AWS_S3_ACCESS_KEY}
         - name: modelConnection.awsSecretAccessKey
-          value: ${MINIO_SECRET_KEY}
+          value: ${AWS_S3_SECRET_KEY}
+        - name: modelConnection.awsS3Bucket
+          value: ${AWS_S3_BUCKET}
         - name: modelConnection.awsS3Endpoint
-          value: ${MINIO_ENDPOINT}
+          value: ${AWS_S3_ENDPOINT}
   syncPolicy:
     automated:
       # prune: true
