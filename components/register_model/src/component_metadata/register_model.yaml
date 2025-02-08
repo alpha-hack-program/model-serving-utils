@@ -1,0 +1,147 @@
+# PIPELINE DEFINITION
+# Name: register-model
+# Inputs:
+#    author: str
+#    input_metrics: system.Metrics
+#    model_description: str
+#    model_format_name: str
+#    model_format_version: str
+#    model_name: str
+#    model_registry_name: str
+#    model_registry_namespace: str
+#    model_uri: str
+#    model_version: str
+#    owner: str
+# Outputs:
+#    output_model_id: str
+components:
+  comp-register-model:
+    executorLabel: exec-register-model
+    inputDefinitions:
+      artifacts:
+        input_metrics:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+      parameters:
+        author:
+          parameterType: STRING
+        model_description:
+          parameterType: STRING
+        model_format_name:
+          parameterType: STRING
+        model_format_version:
+          parameterType: STRING
+        model_name:
+          parameterType: STRING
+        model_registry_name:
+          parameterType: STRING
+        model_registry_namespace:
+          parameterType: STRING
+        model_uri:
+          parameterType: STRING
+        model_version:
+          parameterType: STRING
+        owner:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        output_model_id:
+          parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-register-model:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - register_model
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'model_registry==0.2.13'\
+          \ 'kubernetes==23.6.0' 'load_dotenv==0.1.0' 'botocore==1.35.54' 'boto3==1.35.54'\
+          \ && \"$0\" \"$@\"\n"
+        - python3
+        - -m
+        - kfp.dsl.executor_main
+        image: quay.io/atarazana/register_model:latest
+pipelineInfo:
+  name: register-model
+root:
+  dag:
+    outputs:
+      parameters:
+        output_model_id:
+          valueFromParameter:
+            outputParameterKey: output_model_id
+            producerSubtask: register-model
+    tasks:
+      register-model:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-register-model
+        inputs:
+          artifacts:
+            input_metrics:
+              componentInputArtifact: input_metrics
+          parameters:
+            author:
+              componentInputParameter: author
+            model_description:
+              componentInputParameter: model_description
+            model_format_name:
+              componentInputParameter: model_format_name
+            model_format_version:
+              componentInputParameter: model_format_version
+            model_name:
+              componentInputParameter: model_name
+            model_registry_name:
+              componentInputParameter: model_registry_name
+            model_registry_namespace:
+              componentInputParameter: model_registry_namespace
+            model_uri:
+              componentInputParameter: model_uri
+            model_version:
+              componentInputParameter: model_version
+            owner:
+              componentInputParameter: owner
+        taskInfo:
+          name: register-model
+  inputDefinitions:
+    artifacts:
+      input_metrics:
+        artifactType:
+          schemaTitle: system.Metrics
+          schemaVersion: 0.0.1
+    parameters:
+      author:
+        parameterType: STRING
+      model_description:
+        parameterType: STRING
+      model_format_name:
+        parameterType: STRING
+      model_format_version:
+        parameterType: STRING
+      model_name:
+        parameterType: STRING
+      model_registry_name:
+        parameterType: STRING
+      model_registry_namespace:
+        parameterType: STRING
+      model_uri:
+        parameterType: STRING
+      model_version:
+        parameterType: STRING
+      owner:
+        parameterType: STRING
+  outputDefinitions:
+    parameters:
+      output_model_id:
+        parameterType: STRING
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.8.0

@@ -45,8 +45,8 @@ MODEL_SIZE="$2"
 # Extract model version from the third argument
 MODEL_VERSION="$3"
 
-# Compose model name
-MODEL_NAME="${MODEL_FAMILY}-${MODEL_SIZE}-${MODEL_VERSION}"
+# Compose model name with family, size and version (replacing dots with underscores)
+MODEL_NAME="${MODEL_FAMILY}-${MODEL_SIZE}-${MODEL_VERSION//./}"
 
 # Compose namespace name
 NAMESPACE_NAME="${MODEL_FAMILY}-${MODEL_SIZE}"
@@ -141,6 +141,13 @@ spec:
       # prune: true
       selfHeal: true
 EOF
+
+# Wait until the namespace is created
+while [ "$(oc get namespace ${NAMESPACE_NAME} -o jsonpath='{.status.phase}')" != "Active" ]; do
+  echo "Waiting for namespace ${NAMESPACE_NAME} to be created"
+  sleep 5
+done
+
 
 # Apply hf-creds.yaml
 oc create -f hf-creds.yaml -n ${NAMESPACE_NAME}

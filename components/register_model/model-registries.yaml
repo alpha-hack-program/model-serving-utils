@@ -1,0 +1,197 @@
+apiVersion: v1
+items:
+- apiVersion: modelregistry.opendatahub.io/v1alpha1
+  kind: ModelRegistry
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"modelregistry.opendatahub.io/v1alpha1","kind":"ModelRegistry","metadata":{"annotations":{"openshift.io/description":"","openshift.io/display-name":"model-registry-dev"},"labels":{"app.kubernetes.io/instance":"model-registry-dev","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"model-registry","app.kubernetes.io/version":"0.1.0","helm.sh/chart":"model-registry-0.1.0"},"name":"model-registry-dev","namespace":"rhoai-model-registries"},"spec":{"grpc":{"image":"registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8@sha256:927a88bade78e121d84e4d072f07a203fb00173af3615e00ce712d45329dde2d","port":9090},"istio":{"audiences":["https://kubernetes.default.svc"],"authConfigLabels":{"security.opendatahub.io/authorization-group":"default"},"authProvider":"redhat-ods-applications-auth-provider","gateway":{"grpc":{"gatewayRoute":"enabled","port":443,"tls":{"credentialName":"default-modelregistry-cert","mode":"SIMPLE"}},"istioIngress":"ingressgateway","rest":{"gatewayRoute":"enabled","port":443,"tls":{"credentialName":"default-modelregistry-cert","mode":"SIMPLE"}}},"tlsMode":"ISTIO_MUTUAL"},"mysql":{"database":"metadb","host":"model-registry-dev-db.rhoai-model-registries.svc.cluster.local","passwordSecret":{"key":"database-password","name":"model-registry-dev-db"},"port":3306,"skipDBCreation":false,"username":"root"},"rest":{"image":"quay.io/opendatahub/model-registry:v0.2.10","port":8080,"resources":{"limits":{"cpu":"100m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"serviceRoute":"disabled"}}}
+      openshift.io/description: ""
+      openshift.io/display-name: model-registry-dev
+    creationTimestamp: "2025-01-31T10:15:36Z"
+    finalizers:
+    - modelregistry.opendatahub.io/finalizer
+    generation: 2
+    labels:
+      app.kubernetes.io/instance: model-registry-dev
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: model-registry
+      app.kubernetes.io/version: 0.1.0
+      helm.sh/chart: model-registry-0.1.0
+    name: model-registry-dev
+    namespace: rhoai-model-registries
+    resourceVersion: "5855547"
+    uid: 0b6eebac-cdf9-4521-bdf9-45fc2f81b7a3
+  spec:
+    grpc:
+      image: registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8@sha256:927a88bade78e121d84e4d072f07a203fb00173af3615e00ce712d45329dde2d
+      port: 9090
+    istio:
+      audiences:
+      - https://kubernetes.default.svc
+      authConfigLabels:
+        security.opendatahub.io/authorization-group: default
+      authProvider: redhat-ods-applications-auth-provider
+      gateway:
+        grpc:
+          gatewayRoute: enabled
+          port: 443
+          tls:
+            credentialName: default-modelregistry-cert
+            mode: SIMPLE
+        istioIngress: ingressgateway
+        rest:
+          gatewayRoute: enabled
+          port: 443
+          tls:
+            credentialName: default-modelregistry-cert
+            mode: SIMPLE
+      tlsMode: ISTIO_MUTUAL
+    mysql:
+      database: metadb
+      host: model-registry-dev-db.rhoai-model-registries.svc.cluster.local
+      passwordSecret:
+        key: database-password
+        name: model-registry-dev-db
+      port: 3306
+      skipDBCreation: false
+      username: root
+    rest:
+      image: quay.io/opendatahub/model-registry:v0.2.10
+      port: 8080
+      resources:
+        limits:
+          cpu: 100m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+      serviceRoute: disabled
+  status:
+    conditions:
+    - lastTransitionTime: "2025-01-31T10:16:21Z"
+      message: Deployment was successfully created
+      reason: CreatedDeployment
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2025-02-07T16:34:46Z"
+      message: 'unexpected reconcile error: Internal error occurred: failed calling
+        webhook "rev.validation.istio.io": failed to call webhook: Post "https://istiod-data-science-smcp.istio-system.svc:443/validate?timeout=10s":
+        dial tcp 10.130.2.56:15017: connect: connection refused'
+      reason: DeploymentUnavailable
+      status: "False"
+      type: Available
+    - lastTransitionTime: "2025-01-31T10:16:37Z"
+      message: Istio resources are available
+      reason: ResourcesAvailable
+      status: "True"
+      type: IstioAvailable
+    - lastTransitionTime: "2025-01-31T10:16:37Z"
+      message: Istio Gateway resources are available
+      reason: ResourcesAvailable
+      status: "True"
+      type: GatewayAvailable
+    hosts:
+    - model-registry-dev.rhoai-model-registries.svc.cluster.local
+    - model-registry-dev.rhoai-model-registries
+    - model-registry-dev
+    hostsStr: model-registry-dev.rhoai-model-registries.svc.cluster.local,model-registry-dev.rhoai-model-registries,model-registry-dev
+    specDefaults: '{"grpc":{"resources":{"limits":{"cpu":"100m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}},"istio":{"gateway":{"domain":"apps.cluster-cwxrr.cwxrr.sandbox1533.opentlc.com"}}}'
+- apiVersion: modelregistry.opendatahub.io/v1alpha1
+  kind: ModelRegistry
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"modelregistry.opendatahub.io/v1alpha1","kind":"ModelRegistry","metadata":{"annotations":{"openshift.io/description":"","openshift.io/display-name":"model-registry-users"},"labels":{"app.kubernetes.io/instance":"model-registry-users","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"model-registry","app.kubernetes.io/version":"0.1.0","helm.sh/chart":"model-registry-0.1.0"},"name":"model-registry-users","namespace":"rhoai-model-registries"},"spec":{"grpc":{"image":"registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8@sha256:927a88bade78e121d84e4d072f07a203fb00173af3615e00ce712d45329dde2d","port":9090},"istio":{"audiences":["https://kubernetes.default.svc"],"authConfigLabels":{"security.opendatahub.io/authorization-group":"default"},"authProvider":"redhat-ods-applications-auth-provider","gateway":{"grpc":{"gatewayRoute":"enabled","port":443,"tls":{"credentialName":"default-modelregistry-cert","mode":"SIMPLE"}},"istioIngress":"ingressgateway","rest":{"gatewayRoute":"enabled","port":443,"tls":{"credentialName":"default-modelregistry-cert","mode":"SIMPLE"}}},"tlsMode":"ISTIO_MUTUAL"},"mysql":{"database":"metadb","host":"model-registry-users-db.rhoai-model-registries.svc.cluster.local","passwordSecret":{"key":"database-password","name":"model-registry-users-db"},"port":3306,"skipDBCreation":false,"username":"root"},"rest":{"image":"quay.io/opendatahub/model-registry:v0.2.10","port":8080,"resources":{"limits":{"cpu":"100m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"serviceRoute":"disabled"}}}
+      openshift.io/description: ""
+      openshift.io/display-name: model-registry-users
+    creationTimestamp: "2025-01-30T17:55:05Z"
+    finalizers:
+    - modelregistry.opendatahub.io/finalizer
+    generation: 3
+    labels:
+      app.kubernetes.io/instance: model-registry-users
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: model-registry
+      app.kubernetes.io/version: 0.1.0
+      helm.sh/chart: model-registry-0.1.0
+    name: model-registry-users
+    namespace: rhoai-model-registries
+    resourceVersion: "5878675"
+    uid: 213712b1-3892-4338-a914-46ec9422809a
+  spec:
+    grpc:
+      image: registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8@sha256:927a88bade78e121d84e4d072f07a203fb00173af3615e00ce712d45329dde2d
+      port: 9090
+    istio:
+      audiences:
+      - https://kubernetes.default.svc
+      authConfigLabels:
+        security.opendatahub.io/authorization-group: default
+      authProvider: redhat-ods-applications-auth-provider
+      gateway:
+        grpc:
+          gatewayRoute: enabled
+          port: 443
+          tls:
+            credentialName: default-modelregistry-cert
+            mode: SIMPLE
+        istioIngress: ingressgateway
+        rest:
+          gatewayRoute: enabled
+          port: 443
+          tls:
+            credentialName: default-modelregistry-cert
+            mode: SIMPLE
+      tlsMode: ISTIO_MUTUAL
+    mysql:
+      database: metadb
+      host: model-registry-users-db.rhoai-model-registries.svc.cluster.local
+      passwordSecret:
+        key: database-password
+        name: model-registry-users-db
+      port: 3306
+      skipDBCreation: false
+      username: root
+    rest:
+      image: quay.io/opendatahub/model-registry:v0.2.10
+      port: 8080
+      resources:
+        limits:
+          cpu: 100m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+      serviceRoute: disabled
+  status:
+    conditions:
+    - lastTransitionTime: "2025-02-07T16:41:24Z"
+      message: Updating deployment
+      reason: UpdatingDeployment
+      status: "False"
+      type: Progressing
+    - lastTransitionTime: "2025-02-07T16:41:24Z"
+      message: Istio resources are unavailable
+      reason: ResourcesUnavailable
+      status: "False"
+      type: Available
+    - lastTransitionTime: "2025-02-07T16:41:24Z"
+      message: 'Istio AuthConfig is not ready: {reason: Reconciling, message: }'
+      reason: ResourcesUnavailable
+      status: "False"
+      type: IstioAvailable
+    - lastTransitionTime: "2025-01-30T18:12:11Z"
+      message: Istio Gateway resources are available
+      reason: ResourcesAvailable
+      status: "True"
+      type: GatewayAvailable
+    hosts:
+    - model-registry-users.rhoai-model-registries.svc.cluster.local
+    - model-registry-users.rhoai-model-registries
+    - model-registry-users
+    hostsStr: model-registry-users.rhoai-model-registries.svc.cluster.local,model-registry-users.rhoai-model-registries,model-registry-users
+    specDefaults: '{"grpc":{"resources":{"limits":{"cpu":"100m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"256Mi"}}},"istio":{"gateway":{"domain":"apps.cluster-cwxrr.cwxrr.sandbox1533.opentlc.com"}}}'
+kind: List
+metadata:
+  resourceVersion: ""

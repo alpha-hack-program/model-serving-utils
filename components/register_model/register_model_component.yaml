@@ -1,0 +1,212 @@
+# PIPELINE DEFINITION
+# Name: register-model-test-pl
+# Inputs:
+#    author: str [Default: 'author']
+#    model_description: str [Default: 'model_description']
+#    model_format_name: str [Default: 'model_format_name']
+#    model_format_version: str [Default: 'model_format_version']
+#    model_name: str [Default: 'model_name']
+#    model_registry_name: str [Default: 'model-registry']
+#    model_registry_namespace: str [Default: 'rhoai-model-registries']
+#    model_uri: str [Default: 'oci://model_uri']
+#    model_version: str [Default: 'model_version']
+#    owner: str [Default: 'owner']
+# Outputs:
+#    generate-metrics-Output: system.Metrics
+components:
+  comp-generate-metrics:
+    executorLabel: exec-generate-metrics
+    outputDefinitions:
+      artifacts:
+        Output:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+  comp-register-model:
+    executorLabel: exec-register-model
+    inputDefinitions:
+      artifacts:
+        input_metrics:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+      parameters:
+        author:
+          parameterType: STRING
+        model_description:
+          parameterType: STRING
+        model_format_name:
+          parameterType: STRING
+        model_format_version:
+          parameterType: STRING
+        model_name:
+          parameterType: STRING
+        model_registry_name:
+          parameterType: STRING
+        model_registry_namespace:
+          parameterType: STRING
+        model_uri:
+          parameterType: STRING
+        model_version:
+          parameterType: STRING
+        owner:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        output_model_id:
+          parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-generate-metrics:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - generate_metrics
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.8.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'numpy==1.21.4'\
+          \ && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef generate_metrics(\n    ) -> dsl.Metrics:\n    metrics = dsl.Metrics()\n\
+          \    metrics.log_metric(\"accuracy\", 0.99)\n    metrics.log_metric(\"precision\"\
+          , 0.95)\n    return metrics\n\n"
+        image: python:3.9
+    exec-register-model:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - register_model
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'model_registry==0.2.13'\
+          \ 'kubernetes==23.6.0' 'load_dotenv==0.1.0' 'botocore==1.35.54' 'boto3==1.35.54'\
+          \ && \"$0\" \"$@\"\n"
+        - python3
+        - -m
+        - kfp.dsl.executor_main
+        image: image-registry.openshift-image-registry.svc:5000/default/register_model:latest
+pipelineInfo:
+  name: register-model-test-pl
+root:
+  dag:
+    outputs:
+      artifacts:
+        generate-metrics-Output:
+          artifactSelectors:
+          - outputArtifactKey: Output
+            producerSubtask: generate-metrics
+    tasks:
+      generate-metrics:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-generate-metrics
+        taskInfo:
+          name: generate-metrics
+      register-model:
+        cachingOptions: {}
+        componentRef:
+          name: comp-register-model
+        dependentTasks:
+        - generate-metrics
+        inputs:
+          artifacts:
+            input_metrics:
+              taskOutputArtifact:
+                outputArtifactKey: Output
+                producerTask: generate-metrics
+          parameters:
+            author:
+              componentInputParameter: author
+            model_description:
+              componentInputParameter: model_description
+            model_format_name:
+              componentInputParameter: model_format_name
+            model_format_version:
+              componentInputParameter: model_format_version
+            model_name:
+              componentInputParameter: model_name
+            model_registry_name:
+              componentInputParameter: model_registry_name
+            model_registry_namespace:
+              componentInputParameter: model_registry_namespace
+            model_uri:
+              componentInputParameter: model_uri
+            model_version:
+              componentInputParameter: model_version
+            owner:
+              componentInputParameter: owner
+        taskInfo:
+          name: register-model
+  inputDefinitions:
+    parameters:
+      author:
+        defaultValue: author
+        isOptional: true
+        parameterType: STRING
+      model_description:
+        defaultValue: model_description
+        isOptional: true
+        parameterType: STRING
+      model_format_name:
+        defaultValue: model_format_name
+        isOptional: true
+        parameterType: STRING
+      model_format_version:
+        defaultValue: model_format_version
+        isOptional: true
+        parameterType: STRING
+      model_name:
+        defaultValue: model_name
+        isOptional: true
+        parameterType: STRING
+      model_registry_name:
+        defaultValue: model-registry
+        isOptional: true
+        parameterType: STRING
+      model_registry_namespace:
+        defaultValue: rhoai-model-registries
+        isOptional: true
+        parameterType: STRING
+      model_uri:
+        defaultValue: oci://model_uri
+        isOptional: true
+        parameterType: STRING
+      model_version:
+        defaultValue: model_version
+        isOptional: true
+        parameterType: STRING
+      owner:
+        defaultValue: owner
+        isOptional: true
+        parameterType: STRING
+  outputDefinitions:
+    artifacts:
+      generate-metrics-Output:
+        artifactType:
+          schemaTitle: system.Metrics
+          schemaVersion: 0.0.1
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.8.0
