@@ -45,8 +45,11 @@ MODEL_SIZE="$2"
 # Extract model version from the third argument
 MODEL_VERSION="$3"
 
-# Compose model name with family, size and version (replacing dots with underscores)
-MODEL_NAME="${MODEL_FAMILY}-${MODEL_SIZE}-${MODEL_VERSION//./}"
+# Compose model name with family, size and version
+MODEL_NAME="${MODEL_FAMILY}-${MODEL_SIZE}-${MODEL_VERSION}"
+
+# Ensure that MODEL_NAME is uri safe
+MODEL_NAME=$(echo $MODEL_NAME | sed 's/[^a-zA-Z0-9-]/-/g' | sed 's/\./-/g')
 
 # Compose namespace name
 NAMESPACE_NAME="${MODEL_FAMILY}-${MODEL_SIZE}"
@@ -78,7 +81,7 @@ cat <<EOF | oc apply -f -
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${MODEL_FAMILY}-${MODEL_VERSION}-${MODEL_SIZE}
+  name: ${MODEL_NAME}
   namespace: ${ARGOCD_NAMESPACE}
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous

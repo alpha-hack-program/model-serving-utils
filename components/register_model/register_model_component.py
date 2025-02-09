@@ -10,6 +10,7 @@ import kfp
 
 from kfp import compiler
 from kfp import dsl
+from kfp.dsl import Output, Metrics
 
 from src.register_model import register_model
 
@@ -18,36 +19,39 @@ from src.register_model import register_model
     base_image="python:3.9",
     packages_to_install=["numpy==1.21.4"]
 )
-def generate_metrics(
-    ) -> dsl.Metrics:
-    metrics = dsl.Metrics()
-    metrics.log_metric("accuracy", 0.99)
-    metrics.log_metric("precision", 0.95)
-    return metrics
+def generate_metrics(results_output_metrics: Output[Metrics]):
+    results_output_metrics.log_metric("accuracy", 0.99)
+    results_output_metrics.log_metric("precision", 0.95)
 
 # This pipeline will download training dataset, download the model, test the model and if it performs well, 
 # upload the model to another S3 bucket.
 @dsl.pipeline(name="register-model-test-pl")
 def pipeline(
-    model_registry_name: str = "model-registry",
-    model_registry_namespace: str = "rhoai-model-registries",
+    model_registry_name: str = "model-registry-dev",
+    istio_system_namespace: str = "istio-system",
     model_name: str = "model_name",
     model_uri: str = "oci://model_uri",
-    model_version: str = "model_version",
+    model_version: str = "0.1.0",
     model_description: str = "model_description",
-    model_format_name: str = "model_format_name",
-    model_format_version: str = "model_format_version",
+    model_format_name: str = "onnx",
+    model_format_version: str = "1",
     author: str = "author",
     owner: str = "owner",
     ):
 
     # Generate metrics
-    metrics_task = generate_metrics()
+    generate_metrics_task = generate_metrics()
+
+    # Generate labels
+    labels = {
+        "finance": "",
+        "fraud": ""
+    }
 
     # Register model
-    register_model(
+    register_model_task = register_model(
         model_registry_name=model_registry_name,
-        model_registry_namespace=model_registry_namespace,
+        istio_system_namespace=istio_system_namespace,
         model_name=model_name,
         model_uri=model_uri,
         model_version=model_version,
@@ -56,8 +60,11 @@ def pipeline(
         model_format_version=model_format_version,
         author=author,
         owner=owner,
-        input_metrics=metrics_task.output,
+        labels=labels,
+        input_metrics=generate_metrics_task.outputs["results_output_metrics"],
     ).set_caching_options(False)
+
+    # register_model_task.set_service_account_name("register-model-sa")
 
 if __name__ == '__main__':
     import time

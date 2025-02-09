@@ -2,23 +2,23 @@
 # Name: register-model-test-pl
 # Inputs:
 #    author: str [Default: 'author']
+#    istio_system_namespace: str [Default: 'istio-system']
 #    model_description: str [Default: 'model_description']
-#    model_format_name: str [Default: 'model_format_name']
-#    model_format_version: str [Default: 'model_format_version']
+#    model_format_name: str [Default: 'onnx']
+#    model_format_version: str [Default: '1']
 #    model_name: str [Default: 'model_name']
-#    model_registry_name: str [Default: 'model-registry']
-#    model_registry_namespace: str [Default: 'rhoai-model-registries']
+#    model_registry_name: str [Default: 'model-registry-dev']
 #    model_uri: str [Default: 'oci://model_uri']
-#    model_version: str [Default: 'model_version']
+#    model_version: str [Default: '0.1.0']
 #    owner: str [Default: 'owner']
 # Outputs:
-#    generate-metrics-Output: system.Metrics
+#    generate-metrics-results_output_metrics: system.Metrics
 components:
   comp-generate-metrics:
     executorLabel: exec-generate-metrics
     outputDefinitions:
       artifacts:
-        Output:
+        results_output_metrics:
           artifactType:
             schemaTitle: system.Metrics
             schemaVersion: 0.0.1
@@ -33,6 +33,10 @@ components:
       parameters:
         author:
           parameterType: STRING
+        istio_system_namespace:
+          parameterType: STRING
+        labels:
+          parameterType: STRUCT
         model_description:
           parameterType: STRING
         model_format_name:
@@ -42,8 +46,6 @@ components:
         model_name:
           parameterType: STRING
         model_registry_name:
-          parameterType: STRING
-        model_registry_namespace:
           parameterType: STRING
         model_uri:
           parameterType: STRING
@@ -84,9 +86,9 @@ deploymentSpec:
 
           '
         - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
-          \ *\n\ndef generate_metrics(\n    ) -> dsl.Metrics:\n    metrics = dsl.Metrics()\n\
-          \    metrics.log_metric(\"accuracy\", 0.99)\n    metrics.log_metric(\"precision\"\
-          , 0.95)\n    return metrics\n\n"
+          \ *\n\ndef generate_metrics(results_output_metrics: Output[Metrics]):\n\
+          \    results_output_metrics.log_metric(\"accuracy\", 0.99)\n    results_output_metrics.log_metric(\"\
+          precision\", 0.95)\n\n"
         image: python:3.9
     exec-register-model:
       container:
@@ -106,16 +108,16 @@ deploymentSpec:
         - python3
         - -m
         - kfp.dsl.executor_main
-        image: image-registry.openshift-image-registry.svc:5000/default/register_model:latest
+        image: quay.io/atarazana/register_model:latest
 pipelineInfo:
   name: register-model-test-pl
 root:
   dag:
     outputs:
       artifacts:
-        generate-metrics-Output:
+        generate-metrics-results_output_metrics:
           artifactSelectors:
-          - outputArtifactKey: Output
+          - outputArtifactKey: results_output_metrics
             producerSubtask: generate-metrics
     tasks:
       generate-metrics:
@@ -135,11 +137,18 @@ root:
           artifacts:
             input_metrics:
               taskOutputArtifact:
-                outputArtifactKey: Output
+                outputArtifactKey: results_output_metrics
                 producerTask: generate-metrics
           parameters:
             author:
               componentInputParameter: author
+            istio_system_namespace:
+              componentInputParameter: istio_system_namespace
+            labels:
+              runtimeValue:
+                constant:
+                  finance: ''
+                  fraud: ''
             model_description:
               componentInputParameter: model_description
             model_format_name:
@@ -150,8 +159,6 @@ root:
               componentInputParameter: model_name
             model_registry_name:
               componentInputParameter: model_registry_name
-            model_registry_namespace:
-              componentInputParameter: model_registry_namespace
             model_uri:
               componentInputParameter: model_uri
             model_version:
@@ -166,16 +173,20 @@ root:
         defaultValue: author
         isOptional: true
         parameterType: STRING
+      istio_system_namespace:
+        defaultValue: istio-system
+        isOptional: true
+        parameterType: STRING
       model_description:
         defaultValue: model_description
         isOptional: true
         parameterType: STRING
       model_format_name:
-        defaultValue: model_format_name
+        defaultValue: onnx
         isOptional: true
         parameterType: STRING
       model_format_version:
-        defaultValue: model_format_version
+        defaultValue: '1'
         isOptional: true
         parameterType: STRING
       model_name:
@@ -183,11 +194,7 @@ root:
         isOptional: true
         parameterType: STRING
       model_registry_name:
-        defaultValue: model-registry
-        isOptional: true
-        parameterType: STRING
-      model_registry_namespace:
-        defaultValue: rhoai-model-registries
+        defaultValue: model-registry-dev
         isOptional: true
         parameterType: STRING
       model_uri:
@@ -195,7 +202,7 @@ root:
         isOptional: true
         parameterType: STRING
       model_version:
-        defaultValue: model_version
+        defaultValue: 0.1.0
         isOptional: true
         parameterType: STRING
       owner:
@@ -204,7 +211,7 @@ root:
         parameterType: STRING
   outputDefinitions:
     artifacts:
-      generate-metrics-Output:
+      generate-metrics-results_output_metrics:
         artifactType:
           schemaTitle: system.Metrics
           schemaVersion: 0.0.1

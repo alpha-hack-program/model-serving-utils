@@ -3,12 +3,13 @@
 # Inputs:
 #    author: str
 #    input_metrics: system.Metrics
+#    istio_system_namespace: str
+#    labels: dict
 #    model_description: str
 #    model_format_name: str
 #    model_format_version: str
 #    model_name: str
 #    model_registry_name: str
-#    model_registry_namespace: str
 #    model_uri: str
 #    model_version: str
 #    owner: str
@@ -26,6 +27,10 @@ components:
       parameters:
         author:
           parameterType: STRING
+        istio_system_namespace:
+          parameterType: STRING
+        labels:
+          parameterType: STRUCT
         model_description:
           parameterType: STRING
         model_format_name:
@@ -35,8 +40,6 @@ components:
         model_name:
           parameterType: STRING
         model_registry_name:
-          parameterType: STRING
-        model_registry_namespace:
           parameterType: STRING
         model_uri:
           parameterType: STRING
@@ -92,6 +95,10 @@ root:
           parameters:
             author:
               componentInputParameter: author
+            istio_system_namespace:
+              componentInputParameter: istio_system_namespace
+            labels:
+              componentInputParameter: labels
             model_description:
               componentInputParameter: model_description
             model_format_name:
@@ -102,8 +109,6 @@ root:
               componentInputParameter: model_name
             model_registry_name:
               componentInputParameter: model_registry_name
-            model_registry_namespace:
-              componentInputParameter: model_registry_namespace
             model_uri:
               componentInputParameter: model_uri
             model_version:
@@ -121,6 +126,10 @@ root:
     parameters:
       author:
         parameterType: STRING
+      istio_system_namespace:
+        parameterType: STRING
+      labels:
+        parameterType: STRUCT
       model_description:
         parameterType: STRING
       model_format_name:
@@ -130,8 +139,6 @@ root:
       model_name:
         parameterType: STRING
       model_registry_name:
-        parameterType: STRING
-      model_registry_namespace:
         parameterType: STRING
       model_uri:
         parameterType: STRING

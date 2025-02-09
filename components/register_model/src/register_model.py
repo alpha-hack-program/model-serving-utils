@@ -34,17 +34,18 @@ BOTO3_PIP_VERSION="1.35.54"
                          f"boto3=={BOTO3_PIP_VERSION}"],
 )
 def register_model(
-    model_registry_name: str, # Name of the model registry
-    model_registry_namespace: str, # Namespace of the model registry
+    model_registry_name: str,  # Name of the model registry
+    istio_system_namespace: str,      # Namespace of the istio system namespace
 
-    model_name: str, # Name of the model
-    model_uri: str, # Path to the model file
-    model_version: str, # Version of the model
-    model_description: str, # Description of the model
-    model_format_name: str, # Model format name
+    model_name: str,           # Name of the model
+    model_uri: str,            # Path to the model file
+    model_version: str,        # Version of the model
+    model_description: str,    # Description of the model
+    model_format_name: str,    # Model format name
     model_format_version: str, # Model format version
-    author: str, # Author of the model
-    owner: str, # Owner of the model
+    author: str,               # Author of the model
+    owner: str,                # Owner of the model
+    labels: dict,              # Labels for the model
     input_metrics: Input[Metrics],
     output_model_id: OutputPath(str), # type: ignore
 ):
@@ -53,7 +54,12 @@ def register_model(
     from model_registry import ModelRegistry
 
     # Get the model registry endpoint
-    model_registry_endpoint = get_model_registry_endpoint(model_registry_name, model_registry_namespace)
+    model_registry_endpoint = get_model_registry_endpoint(model_registry_name, istio_system_namespace)
+    if model_registry_endpoint is None:
+        raise ValueError("Model registry endpoint not found.")
+
+    # Print the model registry endpoint
+    print(f"Model registry endpoint: {model_registry_endpoint}")
 
     # Check the uri and return a value error if it is not a valid uri and the protocol is s3, http, https or oci
     if not model_uri.startswith("s3://") and not model_uri.startswith("http://") and not model_uri.startswith("https://") and not model_uri.startswith("oci://"):
@@ -61,6 +67,16 @@ def register_model(
 
     # Generate metadata from the input metrics
     metadata = metrics_to_dict(input_metrics)
+
+    # Add labels to the metadata
+    for key, value in labels.items():
+        metadata[key] = value
+
+    # Convert the metadata values to strings
+    metadata = {key: str(value) for key, value in metadata.items()}
+
+    # Print the metadata
+    print(f"Metadata: {metadata}")
 
     # Create the model registry object
     registry = ModelRegistry(model_registry_endpoint, author="register_model", user_token=get_token())
