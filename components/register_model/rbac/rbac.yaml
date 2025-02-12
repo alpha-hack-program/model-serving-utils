@@ -1,0 +1,25 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: route-access
+  namespace: istio-system  # Target namespace
+rules:
+- apiGroups: ["route.openshift.io"]
+  resources: ["routes"]
+  verbs: ["list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: route-access-binding
+  namespace: istio-system  # Target namespace
+subjects:
+- kind: ServiceAccount
+  name: pipeline-runner-dspa        # Service account name
+  namespace: yolo-uno-cards         # Service account's original namespace
+roleRef:
+  kind: Role
+  name: route-access                # Name of the Role created earlier
+  apiGroup: rbac.authorization.k8s.io
+---
