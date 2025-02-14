@@ -33,6 +33,7 @@ model:
     productName: NVIDIA-A10G
   connection:
     name: llm
+  # image: quay.io/<user>/<model-image>:<tag> => this overrides connection
   volumes:
     shm:
       sizeLimit: 2Gi
