@@ -69,7 +69,7 @@ spec:
     prometheus.io/port: '8080'
   containers:
     - args:
-        - '--model=path=/mnt/models'
+        - '--model-path=/mnt/models'
         - '--trust-remote-code=True'
       {{- if .Values.model.accelerator }}
       image: '{{ .Values.runtime.gpuImage }}'
