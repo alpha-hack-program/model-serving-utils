@@ -43,8 +43,8 @@ model:
       sizeLimit: 2Gi
 
 runtime:
-  gpuImage: quay.io/rh-aiservices-bu/sbert-runtime:1.1.0
-  cpuImage: quay.io/rh-aiservices-bu/sbert-runtime-cpu:1.1.0
+  gpuImage: quay.io/rh-aiservices-bu/sbert-runtime:1.2.0
+  cpuImage: quay.io/rh-aiservices-bu/sbert-runtime-cpu:1.2.0
   
 
 setup:
