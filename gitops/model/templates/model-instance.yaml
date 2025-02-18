@@ -127,8 +127,6 @@ spec:
         medium: Memory
         sizeLimit: {{ .Values.model.volumes.shm.sizeLimit }}
       name: shm
-
-{{- if .Values.model.enableAuth }}
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
@@ -161,6 +159,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: {{ .Values.model.name }}-get-role
+{{- if .Values.model.enableAuth }}
 ---
 kind: Secret
 apiVersion: v1
