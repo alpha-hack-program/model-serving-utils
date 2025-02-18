@@ -56,6 +56,14 @@ spec:
     nodeSelector:
       nvidia.com/gpu.product: {{ .Values.model.accelerator.productName }}
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.model.name }}-sa
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+  labels:
+    opendatahub.io/dashboard: 'true'
+---
 apiVersion: serving.kserve.io/v1alpha1
 kind: ServingRuntime
 metadata:
