@@ -100,7 +100,7 @@ spec:
         - '--distributed-executor-backend=mp'
         {{- if .Values.model.embeddingsModel }}
         - '--task embed'
-        - '--trust-remote-code=True'
+        - '--trust-remote-code'
         {{- end }}
         # https://docs.vllm.ai/en/latest/features/tool_calling.html#ibm-granite
         {{- if .Values.model.toolCallParser }}
