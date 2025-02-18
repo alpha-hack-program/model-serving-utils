@@ -5,9 +5,14 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "2"
     openshift.io/display-name: "{{ .Values.model.displayName }}"
+    security.opendatahub.io/enable-auth: '{{ .Values.model.enableAuth }}'
+    {{- if .Values.model.rawDeployment }}
+    serving.kserve.io/deploymentMode: RawDeployment
+    {{- else }}
     serving.knative.openshift.io/enablePassthrough: 'true'
     sidecar.istio.io/inject: 'true'
     sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+    {{- end }}
   name: {{ .Values.model.name }}
   namespace: {{ .Values.dataScienceProjectNamespace }}
   labels:
@@ -71,6 +76,10 @@ spec:
     - args:
         - '--model-path=/mnt/models'
         - '--trust-remote-code=True'
+        {{- if eq .Values.model.accelerator.productName "Tesla-T4-SHARED" }}
+        - '--dtype'
+        - float16
+        {{- end }}
       {{- if .Values.model.accelerator }}
       image: '{{ .Values.runtime.gpuImage }}'
       {{- else  }}
@@ -85,4 +94,3 @@ spec:
   supportedModelFormats:
     - autoSelect: true
       name: {{ .Values.model.format }}
-
