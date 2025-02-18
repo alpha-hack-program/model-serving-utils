@@ -76,10 +76,6 @@ spec:
     - args:
         - '--model-path=/mnt/models'
         - '--trust-remote-code=True'
-        {{- if eq .Values.model.accelerator.productName "Tesla-T4-SHARED" }}
-        - '--dtype'
-        - float16
-        {{- end }}
       {{- if .Values.model.accelerator }}
       image: '{{ .Values.runtime.gpuImage }}'
       {{- else  }}
