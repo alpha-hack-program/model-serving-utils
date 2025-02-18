@@ -6,9 +6,13 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
     openshift.io/display-name: "{{ .Values.model.displayName }}"
     security.opendatahub.io/enable-auth: '{{ .Values.model.enableAuth }}'
+    {{- if .Values.model.rawDeployment }}
+    serving.kserve.io/deploymentMode: RawDeployment
+    {{- else }}
     serving.knative.openshift.io/enablePassthrough: 'true'
     sidecar.istio.io/inject: 'true'
     sidecar.istio.io/rewriteAppHTTPProbers: 'true'
+    {{- end }}
   name: {{ .Values.model.name }}
   namespace: {{ .Values.dataScienceProjectNamespace }}
   labels:
@@ -22,6 +26,7 @@ spec:
   predictor:
     maxReplicas: {{ .Values.model.maxReplicas }}
     minReplicas: 1
+    serviceAccountName: {{ .Values.model.name }}-sa
     model:
       modelFormat:
         name: {{ .Values.model.format }}
@@ -121,3 +126,46 @@ spec:
         medium: Memory
         sizeLimit: {{ .Values.model.volumes.shm.sizeLimit }}
       name: shm
+
+{{-if Values.model.enableAuth - }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Values.model.name }}-get-role
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+  labels:
+    opendatahub.io/dashboard: 'true'
+rules:
+  - verbs:
+      - get
+    apiGroups:
+      - serving.kserve.io
+    resources:
+      - inferenceservices
+    resourceNames:
+      - {{ .Values.model.name }}
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Values.model.name }}-get-rolebinding
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+  labels:
+    opendatahub.io/dashboard: 'true'
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.model.name }}-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.model.name }}-get-role
+---
+kind: Secret
+apiVersion: v1
+  annotations:
+    kubernetes.io/service-account.name: {{ .Values.model.name }}-sa
+  name: auth-token-secret
+  namespace: {{ .Values.dataScienceProjectNamespace }}
+type: kubernetes.io/service-account-token
+{{- end -}}

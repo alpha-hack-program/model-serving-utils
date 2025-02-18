@@ -16,6 +16,7 @@ model:
   apiProtocol: REST
   embeddingsModel: false
   enableAuth: false
+  rawDeployment: true
   runtime:
     templateName: vllm-serving-template
     templateDisplayName: vLLM Serving Template
