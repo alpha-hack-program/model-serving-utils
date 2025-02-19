@@ -13,6 +13,8 @@ model:
   maxReplicas: 1
   format: pytorch
   apiProtocol: REST
+  enableAuth: false
+  rawDeployment: true
   runtime:
     templateName: nomic-serving-template
     templateDisplayName: Nomic Serving Template

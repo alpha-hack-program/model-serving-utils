@@ -25,9 +25,7 @@ TOKEN=$(oc whoami -t)
 if [ -z "$TOKEN" ]; then
   echo "Error: No token found. Please login to OpenShift using 'oc login' command."
   echo "Compile only mode."
-
   
-
   exit 1
 fi
 

@@ -76,6 +76,11 @@ echo "Deploying model ${MODEL_NAME} in namespace ${NAMESPACE_NAME}"
 echo "Model Root: ${MODEL_ROOT}"
 echo "Model ID: ${MODEL_ID}"
 
+# If enableAuth is true, then create a service account named as the model name
+if [ "$ENABLE_AUTH" = "true" ]; then
+  oc create serviceaccount ${MODEL_NAME}-sa -n ${NAMESPACE_NAME}
+fi
+
 # Create the application object
 cat <<EOF | oc apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -131,13 +136,13 @@ spec:
           value: '1'
         - name: model.accelerator.max
           value: '1'
-        - name: modelConnection.awsAccessKeyId
+        - name: model.connection.awsAccessKeyId
           value: ${AWS_S3_ACCESS_KEY}
-        - name: modelConnection.awsSecretAccessKey
+        - name: model.connection.awsSecretAccessKey
           value: ${AWS_S3_SECRET_KEY}
-        - name: modelConnection.awsS3Bucket
+        - name: model.connection.awsS3Bucket
           value: ${AWS_S3_BUCKET}
-        - name: modelConnection.awsS3Endpoint
+        - name: model.connection.awsS3Endpoint
           value: ${AWS_S3_ENDPOINT}
   syncPolicy:
     automated:

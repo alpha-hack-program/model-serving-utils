@@ -4,12 +4,12 @@
 
 Adapt the following parameters to your environment:
 
-- modelConnection.scheme: http(s)
-- name: modelConnection.awsAccessKeyId: user to access the S3 server
-- name: modelConnection.awsSecretAccessKey: user key
-- name: modelConnection.awsDefaultRegion: region, none in MinIO
-- name: modelConnection.awsS3Bucket: bucket name
-- name: modelConnection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
+- model.connection.scheme: http(s)
+- model.connection.awsAccessKeyId: user to access the S3 server
+- model.connection.awsSecretAccessKey: user key
+- model.connection.awsDefaultRegion: region, none in MinIO
+- model.connection.awsS3Bucket: bucket name
+- model.connection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -27,13 +27,13 @@ spec:
     namespace: embeddings # DATA_SCIENCE_PROJECT_NAMESPACE used later
   source:
     path: gitops/embeddings
-    repoURL: https://github.com/alpha-hack-program/doc-bot-kotaemon.git
+    repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
     targetRevision: main
     helm:
       parameters:
         - name: createNamespace # This has to be false if deploying in the an existing namespace
           value: 'true'
-        - name: modelConnection.createSecret # This has to be false if the secret `embeddings` already exists
+        - name: model.connection.createSecret # This has to be false if the secret `embeddings` already exists
           value: 'true'
         - name: dataScienceProjectNamespace
           value: "embeddings" # DATA_SCIENCE_PROJECT_NAMESPACE used later
@@ -99,12 +99,12 @@ curl -s -X 'POST' \
 
 Adapt the following parameters to your environment:
 
-- modelConnection.scheme: http(s)
-- name: modelConnection.awsAccessKeyId: user to access the S3 server
-- name: modelConnection.awsSecretAccessKey: user key
-- name: modelConnection.awsDefaultRegion: region, none in MinIO
-- name: modelConnection.awsS3Bucket: bucket name
-- name: modelConnection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
+- model.connection.scheme: http(s)
+- model.connection.awsAccessKeyId: user to access the S3 server
+- model.connection.awsSecretAccessKey: user key
+- model.connection.awsDefaultRegion: region, none in MinIO
+- model.connection.awsS3Bucket: bucket name
+- model.connection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -122,13 +122,13 @@ spec:
     namespace: embeddings # DATA_SCIENCE_PROJECT_NAMESPACE used later
   source:
     path: gitops/embeddings
-    repoURL: https://github.com/alpha-hack-program/doc-bot-kotaemon.git
+    repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
     targetRevision: main
     helm:
       parameters:
         - name: createNamespace # This has to be false if deploying in the an existing namespace
           value: 'false'
-        - name: modelConnection.createSecret # This has to be false if the secret `embeddings` already exists
+        - name: model.connection.createSecret # This has to be false if the secret `embeddings` already exists
           value: 'false'
         - name: dataScienceProjectNamespace
           value: "embeddings" # DATA_SCIENCE_PROJECT_NAMESPACE used later

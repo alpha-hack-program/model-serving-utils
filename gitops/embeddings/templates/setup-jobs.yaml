@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: job-{{ .Values.model.name }}-model-setup
+  name: job-{{ .Values.model.name | lower }}-model-setup
   namespace: "{{ .Values.dataScienceProjectNamespace }}"
   annotations:
     argocd.argoproj.io/hook: PreSync

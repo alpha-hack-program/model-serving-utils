@@ -154,23 +154,23 @@ spec:
           value: '1'
         - name: model.accelerator.max
           value: '1'
-        - name: modelConnection.name
+        - name: model.connection.name
           value: llm
-        - name: modelConnection.displayName
+        - name: model.connection.displayName
           value: llm
-        - name: modelConnection.type
+        - name: model.connection.type
           value: s3
-        - name: modelConnection.scheme
+        - name: model.connection.scheme
           value: http
-        - name: modelConnection.awsAccessKeyId
+        - name: model.connection.awsAccessKeyId
           value: minio
-        - name: modelConnection.awsSecretAccessKey
+        - name: model.connection.awsSecretAccessKey
           value: minio123
-        - name: modelConnection.awsDefaultRegion
+        - name: model.connection.awsDefaultRegion
           value: none
-        - name: modelConnection.awsS3Bucket
+        - name: model.connection.awsS3Bucket
           value: models
-        - name: modelConnection.awsS3Endpoint
+        - name: model.connection.awsS3Endpoint
           value: 'minio.ic-shared-minio.svc:9000'
     path: gitops/model
     repoURL: 'https://github.com/alpha-hack-program/doc-bot.git'
@@ -218,12 +218,12 @@ curl -s -X 'POST' \
 
 Adapt the following parameters to your environment:
 
-- modelConnection.scheme: http(s)
-- name: modelConnection.awsAccessKeyId: user to access the S3 server
-- name: modelConnection.awsSecretAccessKey: user key
-- name: modelConnection.awsDefaultRegion: region, none in MinIO
-- name: modelConnection.awsS3Bucket: bucket name
-- name: modelConnection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
+- model.connection.scheme: http(s)
+- model.connection.awsAccessKeyId: user to access the S3 server
+- model.connection.awsSecretAccessKey: user key
+- model.connection.awsDefaultRegion: region, none in MinIO
+- model.connection.awsS3Bucket: bucket name
+- model.connection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -314,7 +314,11 @@ curl -s -X 'POST' \
 }'
 ```
 
-# Deploying Nomic AI
+# Deploying an embedding model
+
+Supported models: https://docs.vllm.ai/en/latest/models/supported_models.html#text-embedding-task-embed
+
+Model deployed https://huggingface.co/intfloat/multilingual-e5-large
 
 ## Deploy the Application object in charge of deploying the Model
 

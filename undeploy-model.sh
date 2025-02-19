@@ -19,5 +19,11 @@ MODEL_SIZE="$2"
 # Extract model version from the third argument
 MODEL_VERSION="$3"
 
+# Compose model name with family, size and version
+MODEL_NAME="${MODEL_FAMILY}-${MODEL_SIZE}-${MODEL_VERSION}"
+
+# Ensure that MODEL_NAME is uri safe
+MODEL_NAME=$(echo $MODEL_NAME | sed 's/[^a-zA-Z0-9-]/-/g' | sed 's/\./-/g')
+
 # Delete the application object
-oc delete application ${MODEL_FAMILY}-${MODEL_VERSION}-${MODEL_SIZE} -n ${ARGOCD_NAMESPACE}
+oc delete application ${MODEL_NAME} -n ${ARGOCD_NAMESPACE}
