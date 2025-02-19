@@ -16,12 +16,12 @@ spec:
         - name: create-ds-connections
           envFrom:
             - secretRef:
-                name: aws-connection-{{ .Values.modelConnection.name }}  # Secret with S3 bucket credentials
+                name: aws-connection-{{ .Values.model.connection.name }}  # Secret with S3 bucket credentials
             - secretRef:
                 name: hf-creds  # Secret with HuggingFace credentials
           env:
             - name: AWS_S3_ENDPOINT_SCHEME
-              value: {{ .Values.modelConnection.scheme }}
+              value: {{ .Values.model.connection.scheme }}
           args:
             - -ec
             - |-

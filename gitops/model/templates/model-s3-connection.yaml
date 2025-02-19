@@ -1,9 +1,9 @@
 # Create secret if instructed to do so
-{{- if .Values.modelConnection.createSecret }}
+{{- if .Values.model.connection.createSecret }}
 kind: Secret
 apiVersion: v1
 metadata:
-  name: aws-connection-{{ .Values.modelConnection.name }}
+  name: aws-connection-{{ .Values.model.connection.name }}
   namespace: {{ .Values.dataScienceProjectNamespace }}
   labels:
     opendatahub.io/dashboard: 'true'
@@ -11,14 +11,14 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
     argocd.argoproj.io/hook: PreSync
-    opendatahub.io/connection-type: {{ .Values.modelConnection.type }}
-    openshift.io/display-name: {{ .Values.modelConnection.displayName }}
+    opendatahub.io/connection-type: {{ .Values.model.connection.type }}
+    openshift.io/display-name: {{ .Values.model.connection.displayName }}
 stringData:
-  AWS_ACCESS_KEY_ID: {{ .Values.modelConnection.awsAccessKeyId }}
-  AWS_SECRET_ACCESS_KEY: {{ .Values.modelConnection.awsSecretAccessKey }}
-  AWS_DEFAULT_REGION: {{ .Values.modelConnection.awsDefaultRegion }}
-  AWS_S3_BUCKET: {{ .Values.modelConnection.awsS3Bucket }}
-  AWS_S3_ENDPOINT: {{ printf "%s://%s" .Values.modelConnection.scheme .Values.modelConnection.awsS3Endpoint }}
+  AWS_ACCESS_KEY_ID: {{ .Values.model.connection.awsAccessKeyId }}
+  AWS_SECRET_ACCESS_KEY: {{ .Values.model.connection.awsSecretAccessKey }}
+  AWS_DEFAULT_REGION: {{ .Values.model.connection.awsDefaultRegion }}
+  AWS_S3_BUCKET: {{ .Values.model.connection.awsS3Bucket }}
+  AWS_S3_ENDPOINT: {{ printf "%s://%s" .Values.model.connection.scheme .Values.model.connection.awsS3Endpoint }}
   
 type: Opaque
 {{- end }}

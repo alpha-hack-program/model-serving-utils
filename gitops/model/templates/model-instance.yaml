@@ -92,7 +92,8 @@ spec:
         - '--max-model-len'
         - '{{ .Values.model.maxModelLen }}'
         {{- end }}
-        {{- if eq .Values.model.accelerator.productName "Tesla-T4-SHARED" }}
+        {{/* If productName contains T4, then use float16 and tensor-parallel-size */}}
+        {{- if .Values.model.accelerator.productName | regexMatch "T4" }}
         - '--dtype'
         - float16
         - '--tensor-parallel-size={{ .Values.model.accelerator.max }}'
@@ -101,7 +102,7 @@ spec:
         {{- if .Values.model.embeddingsModel }}
         - '--trust-remote-code'
         {{- end }}
-        # https://docs.vllm.ai/en/latest/features/tool_calling.html#ibm-granite
+        {{/* https://docs.vllm.ai/en/latest/features/tool_calling.html#ibm-granite */}}
         {{- if .Values.model.toolCallParser }}
         - '--tool-call-parser'
         - '{{ .Values.model.toolCallParser }}'

@@ -313,3 +313,167 @@ curl -s -X 'POST' \
   "temperature": 0
 }'
 ```
+
+# Deploying Nomic AI
+
+## Deploy the Application object in charge of deploying the Model
+
+Adapt the following parameters to your environment:
+
+- modelConnection.scheme: http(s)
+- name: modelConnection.awsAccessKeyId: user to access the S3 server
+- name: modelConnection.awsSecretAccessKey: user key
+- name: modelConnection.awsDefaultRegion: region, none in MinIO
+- name: modelConnection.awsS3Bucket: bucket name
+- name: modelConnection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nomic-embeddings
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  project: default
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: nomic-embeddings-gpu
+  source:
+    path: gitops/model
+    repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
+    targetRevision: main
+    helm:
+      values: |
+        model:
+          root: nomic-ai
+          id: nomic-embed-text-v1
+          name: nomic-embed-text-v1-gpu
+          displayName: Nomic Embed Text V1 GPU
+          maxReplicas: 1
+          format: vLLM
+          maxModelLen: '4096'
+          apiProtocol: REST
+          embeddingsModel: true
+          enableAuth: false
+          rawDeployment: true
+          runtime:
+            templateName: vllm-serving-template
+            templateDisplayName: vLLM Serving Template
+            image: quay.io/modh/vllm@sha256:c86ff1e89c86bc9821b75d7f2bbc170b3c13e3ccf538bf543b1110f23e056316
+            resources:
+              limits:
+                cpu: '8'
+                memory: 24Gi
+              requests:
+                cpu: '6'
+                memory: 24Gi
+          accelerator:
+            max: '1'
+            min: '1'
+            productName: NVIDIA-A10G
+          connection:
+            name: embeddings
+            createSecret: true
+            displayName: embeddings
+            type: s3
+            scheme: http
+            awsAccessKeyId: minio
+            awsSecretAccessKey: minio-parasol
+            awsDefaultRegion: none
+            awsS3Bucket: models
+            awsS3Endpoint: minio.ic-shared-minio.svc:9000
+          volumes:
+            shm:
+              sizeLimit: 2Gi
+  syncPolicy:
+    automated:
+      # prune: true
+      selfHeal: true
+```
+
+**Create a secret called hf-creds**
+
+```sh
+HF_USERNAME=xyz
+HF_TOKEN=hf_**********
+DATA_SCIENCE_PROJECT_NAMESPACE=nomic-embeddings-gpu
+
+oc create secret generic hf-creds \
+  --from-literal=HF_USERNAME=${HF_USERNAME} \
+  --from-literal=HF_TOKEN=${HF_TOKEN} \
+  -n ${DATA_SCIENCE_PROJECT_NAMESPACE}
+```
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nomic-embeddings
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  project: default
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: nomic-embeddings
+  source:
+    path: gitops/model
+    repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
+    targetRevision: main
+    helm:
+      parameters:
+        - name: argocdNamespace
+          value: 'openshift-gitops'
+        - name: createNamespace # This has to be false if deploying in the an existing namespace
+          value: 'true'
+        - name: createSecret # This has to be false if the secret already exists
+          value: 'false'
+        - name: instanceName
+          value: "nomic-embed-text-v1"
+        - name: dataScienceProjectNamespace
+          value: "nomic-embeddings"
+        - name: dataScienceProjectDisplayName
+          value: "nomic-embeddings"
+        - name: model.root
+          value: nomic-ai
+        - name: model.id
+          value: nomic-embed-text-v1
+        - name: model.embeddingsModel
+          value: 'true'
+        - name: model.name
+          value: nomic-embed-text-v1
+        - name: model.displayName
+          value: "Nomic AI Text v1 "
+        - name: model.maxModelLen
+          value: '4096'
+        - name: model.runtime.displayName
+          value: "vLLM Nomic AI"
+        - name: model.runtime.templateName
+          value: "nomic-ai-serving-template"
+        
+  syncPolicy:
+    automated:
+      # prune: true
+      selfHeal: true
+```
+
+**Create a secret called hf-creds**
+
+```sh
+HF_USERNAME=xyz
+HF_TOKEN=hf_**********
+DATA_SCIENCE_PROJECT_NAMESPACE=nomic-embeddings
+
+oc create secret generic hf-creds \
+  --from-literal=HF_USERNAME=${HF_USERNAME} \
+  --from-literal=HF_TOKEN=${HF_TOKEN} \
+  -n ${DATA_SCIENCE_PROJECT_NAMESPACE}
+```
+
+## Test
+
