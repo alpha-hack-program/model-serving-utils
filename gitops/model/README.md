@@ -4,12 +4,12 @@
 
 Adapt the following parameters to your environment:
 
-- modelConnection.scheme: http(s)
-- name: modelConnection.awsAccessKeyId: user to access the S3 server
-- name: modelConnection.awsSecretAccessKey: user key
-- name: modelConnection.awsDefaultRegion: region, none in MinIO
-- name: modelConnection.awsS3Bucket: bucket name
-- name: modelConnection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
+- model.connection.scheme: http(s)
+- name: model.connection.awsAccessKeyId: user to access the S3 server
+- name: model.connection.awsSecretAccessKey: user key
+- name: model.connection.awsDefaultRegion: region, none in MinIO
+- name: model.connection.awsS3Bucket: bucket name
+- name: model.connection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -106,12 +106,12 @@ curl -s -X 'POST' \
 
 Adapt the following parameters to your environment:
 
-- modelConnection.scheme: http(s)
-- name: modelConnection.awsAccessKeyId: user to access the S3 server
-- name: modelConnection.awsSecretAccessKey: user key
-- name: modelConnection.awsDefaultRegion: region, none in MinIO
-- name: modelConnection.awsS3Bucket: bucket name
-- name: modelConnection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
+- model.connection.scheme: http(s)
+- name: model.connection.awsAccessKeyId: user to access the S3 server
+- name: model.connection.awsSecretAccessKey: user key
+- name: model.connection.awsDefaultRegion: region, none in MinIO
+- name: model.connection.awsS3Bucket: bucket name
+- name: model.connection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -320,18 +320,18 @@ curl -s -X 'POST' \
 
 Adapt the following parameters to your environment:
 
-- modelConnection.scheme: http(s)
-- name: modelConnection.awsAccessKeyId: user to access the S3 server
-- name: modelConnection.awsSecretAccessKey: user key
-- name: modelConnection.awsDefaultRegion: region, none in MinIO
-- name: modelConnection.awsS3Bucket: bucket name
-- name: modelConnection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
+- model.connection.scheme: http(s)
+- model.connection.awsAccessKeyId: user to access the S3 server
+- model.connection.awsSecretAccessKey: user key
+- model.connection.awsDefaultRegion: region, none in MinIO
+- model.connection.awsS3Bucket: bucket name
+- model.connection.awsS3Endpoint: host and port (minio.ic-shared-minio.svc:9000)
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: nomic-embeddings
+  name: embeddings-gpu
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
@@ -340,21 +340,28 @@ spec:
   project: default
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: nomic-embeddings-gpu
+    namespace: embeddings-gpu
   source:
     path: gitops/model
     repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
     targetRevision: main
     helm:
       values: |
+        dataScienceProjectDisplayName: embeddings-gpu
+        dataScienceProjectNamespace: embeddings-gpu
+        
+        createNamespace: true
+
+        instanceName: multilingual-e5-large
+
         model:
-          root: nomic-ai
-          id: nomic-embed-text-v1
-          name: nomic-embed-text-v1-gpu
-          displayName: Nomic Embed Text V1 GPU
+          root: intfloat
+          id: multilingual-e5-large
+          name: multilingual-e5-large-gpu
+          displayName: multilingual-e5-large GPU
           maxReplicas: 1
           format: vLLM
-          maxModelLen: '4096'
+          maxModelLen: '512'
           apiProtocol: REST
           embeddingsModel: true
           enableAuth: false
@@ -362,7 +369,7 @@ spec:
           runtime:
             templateName: vllm-serving-template
             templateDisplayName: vLLM Serving Template
-            image: quay.io/modh/vllm@sha256:c86ff1e89c86bc9821b75d7f2bbc170b3c13e3ccf538bf543b1110f23e056316
+            image: quay.io/modh/vllm:rhoai-2.17-cuda
             resources:
               limits:
                 cpu: '8'
@@ -399,7 +406,7 @@ spec:
 ```sh
 HF_USERNAME=xyz
 HF_TOKEN=hf_**********
-DATA_SCIENCE_PROJECT_NAMESPACE=nomic-embeddings-gpu
+DATA_SCIENCE_PROJECT_NAMESPACE=embeddings-gpu
 
 oc create secret generic hf-creds \
   --from-literal=HF_USERNAME=${HF_USERNAME} \
@@ -407,73 +414,30 @@ oc create secret generic hf-creds \
   -n ${DATA_SCIENCE_PROJECT_NAMESPACE}
 ```
 
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: nomic-embeddings
-  namespace: openshift-gitops
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-spec:
-  project: default
-  destination:
-    server: 'https://kubernetes.default.svc'
-    namespace: nomic-embeddings
-  source:
-    path: gitops/model
-    repoURL: https://github.com/alpha-hack-program/model-serving-utils.git
-    targetRevision: main
-    helm:
-      parameters:
-        - name: argocdNamespace
-          value: 'openshift-gitops'
-        - name: createNamespace # This has to be false if deploying in the an existing namespace
-          value: 'true'
-        - name: createSecret # This has to be false if the secret already exists
-          value: 'false'
-        - name: instanceName
-          value: "nomic-embed-text-v1"
-        - name: dataScienceProjectNamespace
-          value: "nomic-embeddings"
-        - name: dataScienceProjectDisplayName
-          value: "nomic-embeddings"
-        - name: model.root
-          value: nomic-ai
-        - name: model.id
-          value: nomic-embed-text-v1
-        - name: model.embeddingsModel
-          value: 'true'
-        - name: model.name
-          value: nomic-embed-text-v1
-        - name: model.displayName
-          value: "Nomic AI Text v1 "
-        - name: model.maxModelLen
-          value: '4096'
-        - name: model.runtime.displayName
-          value: "vLLM Nomic AI"
-        - name: model.runtime.templateName
-          value: "nomic-ai-serving-template"
-        
-  syncPolicy:
-    automated:
-      # prune: true
-      selfHeal: true
-```
-
-**Create a secret called hf-creds**
+## Tests
 
 ```sh
-HF_USERNAME=xyz
-HF_TOKEN=hf_**********
-DATA_SCIENCE_PROJECT_NAMESPACE=nomic-embeddings
+DATA_SCIENCE_PROJECT_NAMESPACE=embeddings-gpu
+RUNTIME_MODEL_ID="multilingual-e5-large-gpu"
+INFERENCE_URL=$(oc get inferenceservice/${RUNTIME_MODEL_ID} -n ${DATA_SCIENCE_PROJECT_NAMESPACE} -o jsonpath='{.status.url}')
+INFERENCE_URL=$(oc get route/${RUNTIME_MODEL_ID} -n ${DATA_SCIENCE_PROJECT_NAMESPACE} -o jsonpath='{.spec.host}')
+echo ${INFERENCE_URL}
 
-oc create secret generic hf-creds \
-  --from-literal=HF_USERNAME=${HF_USERNAME} \
-  --from-literal=HF_TOKEN=${HF_TOKEN} \
-  -n ${DATA_SCIENCE_PROJECT_NAMESPACE}
+curl -s -X 'POST' \
+  "https://${INFERENCE_URL}/v1/embeddings" \
+  -H "Content-Type: application/json" \
+  -d '{ "model": "'${RUNTIME_MODEL_ID}'", "input": "Texto de ejemplo para embedding"}'
 ```
 
-## Test
+Big chunk of text...
 
+```sh
+time curl -s -X 'POST' \
+  "https://${INFERENCE_URL}/v1/embeddings" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "model": "'${RUNTIME_MODEL_ID}'",
+  "input": ["En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidalgo de los de lanza en astillero, adarga antigua, rocín flaco y galgo corredor. Una olla de algo más vaca que carnero, salpicón las más noches, duelos y quebrantos los sábados, lantejas los viernes, algún palomino de añadidura los domingos, consumían las tres partes de su hacienda. El resto della concluían sayo de velarte, calzas de velludo para las fiestas, con sus pantuflos de lo mesmo, y los días de entresemana se honraba con su vellorí de lo más fino. Tenía en su casa una ama que pasaba de los cuarenta, y una sobrina que no llegaba a los veinte, y un mozo de campo y plaza, que así ensillaba el rocín como tomaba la podadera. Frisaba la edad de nuestro hidalgo con los cincuenta años; era de complexión recia, seco de carnes, enjuto de rostro, gran madrugador y amigo de la caza. Quieren decir que tenía el sobrenombre de Quijada, o Quesada, que en esto hay alguna diferencia en los autores que deste caso escriben; aunque por conjeturas verosímiles se deja entender que se llamaba Quijana. Pero esto importa poco a nuestro cuento: basta que en la narración dél no se salga un punto de la verdad."]
+}'
+```
