@@ -139,6 +139,8 @@ spec:
       env:
         - name: HF_HOME
           value: /tmp/hf_home
+        - name: VLLM_CACHE_ROOT
+          value: '/tmp'
       image: '{{ .Values.model.runtime.image }}'
       name: kserve-container
       ports:
