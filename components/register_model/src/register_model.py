@@ -1,5 +1,6 @@
 import os
 import json
+import re
 
 from kfp import compiler
 
@@ -99,7 +100,17 @@ def register_model(
         model_format_name=model_format_name,       # model format: onnx, pytorch, tensorflow, etc.
         model_format_version=model_format_version, # model format version: 1, 2, 3, etc.
         metadata=metadata
-    )    
+    )
+
+    # Isolate the labels with no values
+    tags = {key: value for key, value in metadata.items() if not value}
+
+    # Add the tags to the model as cusom properties
+    model.custom_properties = tags
+    model.description = model_description
+
+    # Save the model
+    registry.update(model)
     
     # Save the model ID to the output path
     with open(output_model_id, 'w') as file:
