@@ -453,7 +453,7 @@ TEXT="En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho 
 
 parallel_requests=10  # Number of parallel jobs
 
-for i in {1..1500}
+for i in {1..5000}
 do
   echo "Request #$i"
   curl -s -X 'POST' "https://${INFERENCE_URL}/v1/embeddings" \

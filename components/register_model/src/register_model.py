@@ -1,5 +1,5 @@
 import os
-from re import L
+import json
 
 from kfp import compiler
 
@@ -45,7 +45,7 @@ def register_model(
     model_format_version: str, # Model format version
     author: str,               # Author of the model
     owner: str,                # Owner of the model
-    labels: dict,              # Labels for the model
+    labels: str,              # Labels for the model as a json string
     input_metrics: Input[Metrics],
     output_model_id: OutputPath(str), # type: ignore
 ):
@@ -68,9 +68,16 @@ def register_model(
     # Generate metadata from the input metrics
     metadata = metrics_to_dict(input_metrics)
 
-    # Add labels to the metadata
-    for key, value in labels.items():
-        metadata[key] = value
+    # Check if labels is a non-empty string
+    if labels and labels.strip():
+        # If the labels is not a valid json string, return a value error
+        try:
+            # Add labels to the metadata
+            labels = json.loads(labels)
+            for key, value in labels.items():
+                metadata[key] = value
+        except json.JSONDecodeError:
+            raise ValueError("Invalid labels. Labels must be a valid JSON string.")
 
     # Convert the metadata values to strings
     metadata = {key: str(value) for key, value in metadata.items()}
