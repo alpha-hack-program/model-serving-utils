@@ -53,7 +53,7 @@ spec:
     skipDBCreation: false
     username: root
   rest:
-    image: {{ .Values.registry.rest.image | default "quay.io/opendatahub/model-registry:v0.2.12" }}
+    image: {{ .Values.registry.rest.image | default "quay.io/opendatahub/model-registry:v0.2.10" }}
     port: 8080
     {{- with .Values.registry.rest.resources }}
     resources:
