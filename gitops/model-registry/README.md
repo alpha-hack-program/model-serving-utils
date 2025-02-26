@@ -62,3 +62,10 @@ curl -s -X 'POST' \
 }'
 ```
 
+# OpenAPI 
+
+```sh
+curl -s https://raw.githubusercontent.com/kubeflow/model-registry/refs/heads/main/api/openapi/model-registry.yaml
+```
+
+Change host in `model-registry.yaml` to point to `${MODEL_REGISTRY_URL}`.
