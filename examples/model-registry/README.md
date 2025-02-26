@@ -6,7 +6,7 @@ Let's get the host of the model registry by using an `oc` command.
 
 ```sh
 MODEL_REGISTRY_NAME=model-registry-dev
-MODEL_REGISTRY_HOST=$(oc get routes -n istio-system -l app.kubernetes.io/instance=${MODEL_REGISTRY_NAME} -o json | jq '.items[].status.ingress[].host | select(contains("-rest"))')
+MODEL_REGISTRY_HOST=$(oc get routes -n istio-system -l app.kubernetes.io/instance=${MODEL_REGISTRY_NAME} -o json | jq -r '.items[].status.ingress[].host | select(contains("-rest"))')
 TOKEN=$(oc whoami -t)
 ```
 

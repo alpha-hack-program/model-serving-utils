@@ -114,7 +114,7 @@ def register_model(
     registry.update(model)
     
     # Retrieve the model version
-    model_version = registry.get_model_version(model.id, model_version)
+    model_version = registry.get_model_version(model_name, model_version)
 
     # Save the model ID to the output path
     with open(output_model_id, 'w') as file:
@@ -122,7 +122,7 @@ def register_model(
 
     # Save the model version to the output path
     with open(output_model_version_id, 'w') as file:
-        file.write(model_version.external_id)
+        file.write(model_version.id)
     
     
 if __name__ == "__main__":
