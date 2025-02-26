@@ -46,9 +46,10 @@ def register_model(
     model_format_version: str, # Model format version
     author: str,               # Author of the model
     owner: str,                # Owner of the model
-    labels: str,              # Labels for the model as a json string
-    input_metrics: Input[Metrics],
-    output_model_id: OutputPath(str), # type: ignore
+    labels: str,               # Labels for the model as a json string
+    input_metrics: Input[Metrics],         # Input metrics
+    output_model_id: OutputPath(str),      # type: ignore
+    output_model_version: OutputPath(str), # type: ignore
 ):
     from utils import get_token, metrics_to_dict, get_model_registry_endpoint
 
@@ -112,11 +113,18 @@ def register_model(
     # Save the model
     registry.update(model)
     
+    # Retrieve the model version
+    model_version = registry.get_model_version(model.id, model_version)
+
     # Save the model ID to the output path
     with open(output_model_id, 'w') as file:
         file.write(model.id)
-    
 
+    # Save the model version to the output path
+    with open(output_model_version, 'w') as file:
+        file.write(model_version.external_id)
+    
+    
 if __name__ == "__main__":
     # Generate and save the component YAML file
     component_package_path = __file__.replace('.py', '.yaml')

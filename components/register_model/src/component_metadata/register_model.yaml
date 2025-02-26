@@ -15,6 +15,7 @@
 #    owner: str
 # Outputs:
 #    output_model_id: str
+#    output_model_version: str
 components:
   comp-register-model:
     executorLabel: exec-register-model
@@ -51,6 +52,8 @@ components:
       parameters:
         output_model_id:
           parameterType: STRING
+        output_model_version:
+          parameterType: STRING
 deploymentSpec:
   executors:
     exec-register-model:
@@ -81,6 +84,10 @@ root:
         output_model_id:
           valueFromParameter:
             outputParameterKey: output_model_id
+            producerSubtask: register-model
+        output_model_version:
+          valueFromParameter:
+            outputParameterKey: output_model_version
             producerSubtask: register-model
     tasks:
       register-model:
@@ -149,6 +156,8 @@ root:
   outputDefinitions:
     parameters:
       output_model_id:
+        parameterType: STRING
+      output_model_version:
         parameterType: STRING
 schemaVersion: 2.1.0
 sdkVersion: kfp-2.8.0
