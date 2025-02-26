@@ -49,7 +49,7 @@ def register_model(
     labels: str,               # Labels for the model as a json string
     input_metrics: Input[Metrics],         # Input metrics
     output_model_id: OutputPath(str),      # type: ignore
-    output_model_version: OutputPath(str), # type: ignore
+    output_model_version_id: OutputPath(str), # type: ignore
 ):
     from utils import get_token, metrics_to_dict, get_model_registry_endpoint
 
@@ -121,7 +121,7 @@ def register_model(
         file.write(model.id)
 
     # Save the model version to the output path
-    with open(output_model_version, 'w') as file:
+    with open(output_model_version_id, 'w') as file:
         file.write(model_version.external_id)
     
     
