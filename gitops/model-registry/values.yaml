@@ -2,8 +2,18 @@ kubernetesClusterDomain: cluster.local
 
 registry:
   namespace: rhoai-model-registries
+  rest:
+    image: registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8:v2.17.0
+    # port: 8080
+    # resources:
+    #   limits:
+    #     cpu: 100m
+    #     memory: 256Mi
+    #   requests:
+    #     cpu: 100m
+    #     memory: 256Mi
   grpc:
-    image: registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8@sha256:927a88bade78e121d84e4d072f07a203fb00173af3615e00ce712d45329dde2d
+    image: registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8:v2.17.0
     # port: 9090
     # resources:
     #   limits:

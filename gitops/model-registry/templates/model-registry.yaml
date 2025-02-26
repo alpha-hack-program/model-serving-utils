@@ -10,9 +10,9 @@ metadata:
     openshift.io/display-name: {{ include "model-registry.fullname" . }}
 spec:
   grpc:
-    image: {{ .Values.registry.grpc.image | default "quay.io/opendatahub/model-registry:v0.2.12" }}
+    image: {{ .Values.registry.grpc.image | default "registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8:v2.17" }}
     port: {{ .Values.registry.grpc.port | default 9090 }}
-     {{- with .Values.registry.grpc.resources }}
+    {{- with .Values.registry.grpc.resources }}
     resources:
       limits:
         cpu: {{ .limits.cpu | default "100m" }}
@@ -53,13 +53,15 @@ spec:
     skipDBCreation: false
     username: root
   rest:
-    image: quay.io/opendatahub/model-registry:v0.2.10
+    image: {{ .Values.registry.rest.image | default "registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8:v2.17" }}
     port: 8080
+    {{- with .Values.registry.rest.resources }}
     resources:
       limits:
-        cpu: 100m
-        memory: 256Mi
+        cpu: {{ .limits.cpu | default "100m" }}
+        memory: {{ .limits.memory | default "256Mi" }}
       requests:
-        cpu: 100m
-        memory: 256Mi
+        cpu: {{ .requests.cpu | default "100m" }}
+        memory: {{ .requests.memory | default "256Mi" }}
+    {{- end }}
     serviceRoute: disabled
