@@ -10,7 +10,7 @@ metadata:
     openshift.io/display-name: {{ include "model-registry.fullname" . }}
 spec:
   grpc:
-    image: {{ .Values.registry.grpc.image | default "registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8:v2.17" }}
+    image: {{ .Values.registry.grpc.image | default "quay.io/opendatahub/model-registry:v0.2.12" }}
     port: {{ .Values.registry.grpc.port | default 9090 }}
     {{- with .Values.registry.grpc.resources }}
     resources:
@@ -53,7 +53,7 @@ spec:
     skipDBCreation: false
     username: root
   rest:
-    image: {{ .Values.registry.rest.image | default "registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8:v2.17" }}
+    image: {{ .Values.registry.rest.image | default "quay.io/opendatahub/model-registry:v0.2.12" }}
     port: 8080
     {{- with .Values.registry.rest.resources }}
     resources:
