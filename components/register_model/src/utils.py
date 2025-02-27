@@ -108,6 +108,12 @@ def metrics_to_dict(metrics_input: Input[Metrics]) -> dict:
 
     # Get all key:values from metrics_input.metadata
     metrics_dict = {}
+
+    # If metrics_input or metrics_input.metadata is None
+    if metrics_input is None or metrics_input.metadata is None:
+        return metrics_dict
+
+    # Loop through the metrics_input.metadata and add key:values to metrics_dict
     for key, value in metrics_input.metadata.items():
         metrics_dict[key] = value
     
