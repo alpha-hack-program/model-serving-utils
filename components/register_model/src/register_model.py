@@ -47,7 +47,6 @@ def register_model(
     author: str,               # Author of the model
     owner: str,                # Owner of the model
     labels: str,               # Labels for the model as a json string
-    input_metrics: Input[Metrics],         # Input metrics
     output_model_id: OutputPath(str),         # type: ignore
     output_model_version_id: OutputPath(str), # type: ignore
 ):
@@ -67,8 +66,8 @@ def register_model(
     if not model_uri.startswith("s3://") and not model_uri.startswith("http://") and not model_uri.startswith("https://") and not model_uri.startswith("oci://"):
         raise ValueError("Invalid model URI. Supported protocols are s3, http, https, and oci.")
 
-    # Generate metadata from the input metrics
-    metadata = metrics_to_dict(input_metrics)
+    # Generate metadata dict
+    metadata = {}
 
     # Check if labels is a non-empty string
     if labels and labels.strip():

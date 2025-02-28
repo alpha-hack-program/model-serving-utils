@@ -2,7 +2,6 @@
 # Name: register-model
 # Inputs:
 #    author: str
-#    input_metrics: system.Metrics
 #    istio_system_namespace: str
 #    labels: str
 #    model_description: str
@@ -20,11 +19,6 @@ components:
   comp-register-model:
     executorLabel: exec-register-model
     inputDefinitions:
-      artifacts:
-        input_metrics:
-          artifactType:
-            schemaTitle: system.Metrics
-            schemaVersion: 0.0.1
       parameters:
         author:
           parameterType: STRING
@@ -96,9 +90,6 @@ root:
         componentRef:
           name: comp-register-model
         inputs:
-          artifacts:
-            input_metrics:
-              componentInputArtifact: input_metrics
           parameters:
             author:
               componentInputParameter: author
@@ -125,11 +116,6 @@ root:
         taskInfo:
           name: register-model
   inputDefinitions:
-    artifacts:
-      input_metrics:
-        artifactType:
-          schemaTitle: system.Metrics
-          schemaVersion: 0.0.1
     parameters:
       author:
         parameterType: STRING
