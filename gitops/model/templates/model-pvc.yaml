@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: models-pvc
+  name: {{ .Values.model.name }}-pvc
   namespace: "{{ .Values.dataScienceProjectNamespace }}"
   labels:
-    app: models-pvc
+    app: {{ .Values.model.name }}-pvc
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: HookFailed
