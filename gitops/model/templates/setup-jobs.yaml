@@ -69,4 +69,4 @@ spec:
       volumes:
         - name: models-volume
           persistentVolumeClaim:
-            claimName: models-pvc
+            claimName: {{ .Values.model.name }}-pvc
