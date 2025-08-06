@@ -424,7 +424,7 @@ oc create secret generic hf-creds \
 DATA_SCIENCE_PROJECT_NAMESPACE=embeddings-gpu
 RUNTIME_MODEL_ID="multilingual-e5-large-gpu"
 INFERENCE_URL=$(oc get inferenceservice/${RUNTIME_MODEL_ID} -n ${DATA_SCIENCE_PROJECT_NAMESPACE} -o jsonpath='{.status.url}')
-INFERENCE_URL=$(oc get route/${RUNTIME_MODEL_ID} -n ${DATA_SCIENCE_PROJECT_NAMESPACE} -o jsonpath='{.spec.host}')
+INFERENCE_URL=$(oc get route/${RUNTIME_MODEL_ID}-predictor -n ${DATA_SCIENCE_PROJECT_NAMESPACE} -o jsonpath='{.spec.host}')
 echo ${INFERENCE_URL}
 
 curl -s -X 'POST' \

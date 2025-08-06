@@ -1,0 +1,20 @@
+!*.yaml
+__pycache__/
+# Ignore all Python bytecode files
+*.py[cod]
+# Ignore all Python cache directories
+*.pyc
+# Ignore all Python egg files
+*.egg
+# Ignore all Python distribution files
+*.whl
+# Ignore all Python virtual environment directories
+.venv/
+# Ignore all Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+# Ignore all log files
+*.log
+# Ignore all coverage reports
+*.coverage
+# Ignore all test output files
+*.test

@@ -2,13 +2,13 @@
 # Name: register-model
 # Inputs:
 #    author: str
-#    istio_system_namespace: str
 #    labels: str
 #    model_description: str
 #    model_format_name: str
 #    model_format_version: str
 #    model_name: str
 #    model_registry_name: str
+#    model_registry_namespace: str
 #    model_uri: str
 #    model_version: str
 #    owner: str
@@ -22,8 +22,6 @@ components:
       parameters:
         author:
           parameterType: STRING
-        istio_system_namespace:
-          parameterType: STRING
         labels:
           parameterType: STRING
         model_description:
@@ -35,6 +33,8 @@ components:
         model_name:
           parameterType: STRING
         model_registry_name:
+          parameterType: STRING
+        model_registry_namespace:
           parameterType: STRING
         model_uri:
           parameterType: STRING
@@ -62,13 +62,13 @@ deploymentSpec:
         - -c
         - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
           \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
-          \ python3 -m pip install --quiet --no-warn-script-location 'model_registry==0.2.13'\
+          \ python3 -m pip install --quiet --no-warn-script-location 'model_registry==0.2.14'\
           \ 'kubernetes==23.6.0' 'load_dotenv==0.1.0' 'botocore==1.35.54' 'boto3==1.35.54'\
           \ && \"$0\" \"$@\"\n"
         - python3
         - -m
         - kfp.dsl.executor_main
-        image: quay.io/atarazana/register_model:latest
+        image: quay.io/atarazana/register_model:v1.0.2
 pipelineInfo:
   name: register-model
 root:
@@ -93,8 +93,6 @@ root:
           parameters:
             author:
               componentInputParameter: author
-            istio_system_namespace:
-              componentInputParameter: istio_system_namespace
             labels:
               componentInputParameter: labels
             model_description:
@@ -107,6 +105,8 @@ root:
               componentInputParameter: model_name
             model_registry_name:
               componentInputParameter: model_registry_name
+            model_registry_namespace:
+              componentInputParameter: model_registry_namespace
             model_uri:
               componentInputParameter: model_uri
             model_version:
@@ -119,8 +119,6 @@ root:
     parameters:
       author:
         parameterType: STRING
-      istio_system_namespace:
-        parameterType: STRING
       labels:
         parameterType: STRING
       model_description:
@@ -132,6 +130,8 @@ root:
       model_name:
         parameterType: STRING
       model_registry_name:
+        parameterType: STRING
+      model_registry_namespace:
         parameterType: STRING
       model_uri:
         parameterType: STRING

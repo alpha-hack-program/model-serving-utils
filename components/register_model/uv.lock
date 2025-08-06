@@ -473,7 +473,7 @@ wheels = [
 
 [[package]]
 name = "model-registry"
-version = "0.2.13"
+version = "0.2.21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -484,9 +484,9 @@ dependencies = [
     { name = "python-dateutil" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cd/d4/adfd60b71709f54f2af56a355662032ab97fa218487290e7a3eed4e05a6d/model_registry-0.2.13.tar.gz", hash = "sha256:deebf9e4f0cba4efd20d3977b84913a0bbf6c482f79b356c3e6314ae82039a76", size = 60149 }
+sdist = { url = "https://files.pythonhosted.org/packages/9d/b7/0254b6d660b46b1e8f74e7b8f5b0d6c5ae4b083c4c294649f56bb60671ad/model_registry-0.2.21.tar.gz", hash = "sha256:07eb145fedf519c16cdd9151f49d53fa6b10b68dfd81a92e67f4c9e2b7f6c244", size = 72602 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/0a/4f0329dac1c5e0edf29d03fb995b163f8cc7a90ce98f1a75c9a6e2c6affd/model_registry-0.2.13-py3-none-any.whl", hash = "sha256:502cfe40712159d630e1d7b1d24ac995ec9999a4d3bb29a2c8d95c0fad9f5a2d", size = 139093 },
+    { url = "https://files.pythonhosted.org/packages/c7/33/737f428a7d8410bef207746271c4a874a5697b78cb685ff16e689ee21c4d/model_registry-0.2.21-py3-none-any.whl", hash = "sha256:1546fb3b9f888a01b34307d330078241bae1244a123a83b008c85e9384e29205", size = 143552 },
 ]
 
 [[package]]
@@ -754,7 +754,7 @@ requires-dist = [
     { name = "kfp", extras = ["kubernetes"], specifier = "==2.8.0" },
     { name = "kubernetes", specifier = "==23.6.0" },
     { name = "load-dotenv", specifier = "==0.1.0" },
-    { name = "model-registry", specifier = "==0.2.13" },
+    { name = "model-registry", specifier = "==0.2.21" },
 ]
 
 [[package]]

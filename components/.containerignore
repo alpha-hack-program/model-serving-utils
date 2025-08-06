@@ -1,0 +1,13 @@
+**/__pycache__
+**/.git
+**/.DS_Store
+**/*.old
+**/*.log
+**/*.pyc
+**/*.bkp
+**/.venv
+**/.vscode
+**/.pytest_cache
+**/component_metadata
+Dockerfile
+Containerfile

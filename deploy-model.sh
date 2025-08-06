@@ -131,7 +131,7 @@ spec:
         - name: model.runtime.templateName
           value: "${MODEL_FAMILY}-${MODEL_SIZE}-serving-template"
         - name: model.accelerator.productName
-          value: "NVIDIA-A10G"
+          value: "NVIDIA-A10G-SHARED"
         - name: model.accelerator.min
           value: '1'
         - name: model.accelerator.max
