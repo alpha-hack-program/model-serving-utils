@@ -60,6 +60,5 @@ spec:
       key: database-password
       name: {{ include "model-registry.fullname" . }}-db
     port: {{ .Values.registryDb.databasePort | default 3306 }}
-    skipDBCreation: false
     username: root
   
