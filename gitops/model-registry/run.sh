@@ -1,5 +1,5 @@
 #!/bin/sh
-ARGOCD_APP_NAME=model-registry
+ARGOCD_APP_NAME=model-registry-dev
 
 # Load environment variables
 DATA_SCIENCE_PROJECT_NAMESPACE="model-registry"

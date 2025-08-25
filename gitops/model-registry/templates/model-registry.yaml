@@ -9,10 +9,15 @@ metadata:
     openshift.io/description: ""
     openshift.io/display-name: {{ include "model-registry.fullname" . }}
 spec:
+  {{- with .Values.registry.grpc }}
   grpc:
-    image: {{ .Values.registry.grpc.image | default "quay.io/opendatahub/model-registry:v0.2.12" }}
-    port: {{ .Values.registry.grpc.port | default 9090 }}
-    {{- with .Values.registry.grpc.resources }}
+    {{- if .image }}
+    image: {{ .image }}
+    {{- end }}
+    {{- if .port }}
+    port: {{ .port | default 9090 }}
+    {{- end }}
+    {{- with .resources }}
     resources:
       limits:
         cpu: {{ .limits.cpu | default "100m" }}
@@ -21,28 +26,33 @@ spec:
         cpu: {{ .requests.cpu | default "100m" }}
         memory: {{ .requests.memory | default "256Mi" }}
     {{- end }}
+  {{- end }}
 
-  istio:
-    audiences:
-    - https://kubernetes.default.svc
-    authConfigLabels:
-      security.opendatahub.io/authorization-group: default
-    authProvider: redhat-ods-applications-auth-provider
-    gateway:
-      grpc:
-        gatewayRoute: enabled
-        port: 443
-        tls:
-          credentialName: default-modelregistry-cert
-          mode: SIMPLE
-      istioIngress: ingressgateway
-      rest:
-        gatewayRoute: enabled
-        port: 443
-        tls:
-          credentialName: default-modelregistry-cert
-          mode: SIMPLE
-    tlsMode: ISTIO_MUTUAL
+  {{- with .Values.registry.rest }}
+  rest:
+    {{- if .image }}
+    image: {{ .image }}
+    {{- end }}
+    {{- if .port }}
+    port: {{ .port | default 8080 }}
+    {{- end }}
+    {{- with .resources }}
+    resources:
+      limits:
+        cpu: {{ .limits.cpu | default "100m" }}
+        memory: {{ .limits.memory | default "256Mi" }}
+      requests:
+        cpu: {{ .requests.cpu | default "100m" }}
+        memory: {{ .requests.memory | default "256Mi" }}
+    {{- end }}
+    serviceRoute: {{ .serviceRoute }}
+  {{- end }}
+  
+  oauthProxy:
+    port: 8443
+    routePort: 443
+    serviceRoute: enabled
+
   mysql:
     database: metadb
     host: {{ include "model-registry.fullname" . }}-db.rhoai-model-registries.svc.cluster.local
@@ -52,16 +62,4 @@ spec:
     port: {{ .Values.registryDb.databasePort | default 3306 }}
     skipDBCreation: false
     username: root
-  rest:
-    image: {{ .Values.registry.rest.image | default "quay.io/opendatahub/model-registry:v0.2.10" }}
-    port: 8080
-    {{- with .Values.registry.rest.resources }}
-    resources:
-      limits:
-        cpu: {{ .limits.cpu | default "100m" }}
-        memory: {{ .limits.memory | default "256Mi" }}
-      requests:
-        cpu: {{ .requests.cpu | default "100m" }}
-        memory: {{ .requests.memory | default "256Mi" }}
-    {{- end }}
-    serviceRoute: disabled
+  
