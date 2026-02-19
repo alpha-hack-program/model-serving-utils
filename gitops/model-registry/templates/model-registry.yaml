@@ -48,11 +48,6 @@ spec:
     serviceRoute: {{ .serviceRoute }}
   {{- end }}
   
-  oauthProxy:
-    port: 8443
-    routePort: 443
-    serviceRoute: enabled
-
   mysql:
     database: metadb
     host: {{ include "model-registry.fullname" . }}-db.rhoai-model-registries.svc.cluster.local
