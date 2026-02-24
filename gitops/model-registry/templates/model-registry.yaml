@@ -4,20 +4,17 @@ metadata:
   name: {{ include "model-registry.fullname" . }}
   namespace: {{ .Values.registry.namespace }}
   labels:
-  {{- include "model-registry.labels" . | nindent 4 }}
+    {{- include "model-registry.labels" . | nindent 4 }}
   annotations:
     openshift.io/description: ""
     openshift.io/display-name: {{ include "model-registry.fullname" . }}
 spec:
-  {{- with .Values.registry.grpc }}
   grpc:
-    {{- if .image }}
-    image: {{ .image }}
+    {{- if .Values.registry.grpc.image }}
+    image: {{ .Values.registry.grpc.image }}
     {{- end }}
-    {{- if .port }}
-    port: {{ .port | default 9090 }}
-    {{- end }}
-    {{- with .resources }}
+    port: {{ .Values.registry.grpc.port | default 9090 }}
+    {{- with .Values.registry.grpc.resources }}
     resources:
       limits:
         cpu: {{ .limits.cpu | default "100m" }}
@@ -26,17 +23,13 @@ spec:
         cpu: {{ .requests.cpu | default "100m" }}
         memory: {{ .requests.memory | default "256Mi" }}
     {{- end }}
-  {{- end }}
 
-  {{- with .Values.registry.rest }}
   rest:
-    {{- if .image }}
-    image: {{ .image }}
+    {{- if .Values.registry.rest.image }}
+    image: {{ .Values.registry.rest.image }}
     {{- end }}
-    {{- if .port }}
-    port: {{ .port | default 8080 }}
-    {{- end }}
-    {{- with .resources }}
+    port: {{ .Values.registry.rest.port | default 8080 }}
+    {{- with .Values.registry.rest.resources }}
     resources:
       limits:
         cpu: {{ .limits.cpu | default "100m" }}
@@ -45,9 +38,8 @@ spec:
         cpu: {{ .requests.cpu | default "100m" }}
         memory: {{ .requests.memory | default "256Mi" }}
     {{- end }}
-    serviceRoute: {{ .serviceRoute }}
-  {{- end }}
-  
+    serviceRoute: {{ .Values.registry.rest.serviceRoute | default "disabled" }}
+
   mysql:
     database: metadb
     host: {{ include "model-registry.fullname" . }}-db.rhoai-model-registries.svc.cluster.local
@@ -56,4 +48,3 @@ spec:
       name: {{ include "model-registry.fullname" . }}-db
     port: {{ .Values.registryDb.databasePort | default 3306 }}
     username: root
-  
