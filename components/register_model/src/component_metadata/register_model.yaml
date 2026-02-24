@@ -58,17 +58,10 @@ deploymentSpec:
         - --function_to_execute
         - register_model
         command:
-        - sh
-        - -c
-        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
-          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
-          \ python3 -m pip install --quiet --no-warn-script-location 'model_registry==0.3.6'\
-          \ 'kubernetes==23.6.0' 'load_dotenv==0.1.0' 'botocore==1.35.54' 'boto3==1.35.54'\
-          \ && \"$0\" \"$@\"\n"
         - python3
         - -m
         - kfp.dsl.executor_main
-        image: quay.io/atarazana/register_model:v1.0.4
+        image: quay.io/atarazana/register_model:v1.0.5
 pipelineInfo:
   name: register-model
 root:

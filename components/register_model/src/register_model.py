@@ -24,11 +24,11 @@ REGISTRY=os.environ.get("REGISTRY", f"image-registry.openshift-image-registry.sv
 TAG=os.environ.get("TAG", f"latest")
 TARGET_IMAGE=f"{REGISTRY}/{COMPONENT_NAME}:{TAG}"
 
-MODEL_REGISTRY_PIP_VERSION="0.3.6"
-K8S_PIP_VERSION="23.6.0"
-LOAD_DOTENV_PIP_VERSION="0.1.0"
-BOTOCORE_PIP_VERSION="1.35.54"
-BOTO3_PIP_VERSION="1.35.54"
+# MODEL_REGISTRY_PIP_VERSION="0.3.6"
+# K8S_PIP_VERSION="23.6.0"
+# LOAD_DOTENV_PIP_VERSION="0.1.0"
+# BOTOCORE_PIP_VERSION="1.35.54"
+# BOTO3_PIP_VERSION="1.35.54"
 
 # Allowed log levels
 VALID_LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
@@ -192,11 +192,6 @@ def _register_model(
 @dsl.component(
     base_image=BASE_IMAGE,
     target_image=TARGET_IMAGE,
-    packages_to_install=[f"model_registry=={MODEL_REGISTRY_PIP_VERSION}",
-                         f"kubernetes=={K8S_PIP_VERSION}",
-                         f"load_dotenv=={LOAD_DOTENV_PIP_VERSION}",
-                         f"botocore=={BOTOCORE_PIP_VERSION}",
-                         f"boto3=={BOTO3_PIP_VERSION}"],
 )
 def register_model(
     model_registry_name: str,  # Name of the model registry
