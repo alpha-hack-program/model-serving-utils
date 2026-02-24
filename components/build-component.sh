@@ -27,7 +27,7 @@ export TAG
 
 # Build the component using the kfp CLI
 export PYTHONPATH=${PYTHONPATH}:$(pwd)/${COMPONENT_NAME}/src:$(pwd)/shared
-kfp component build ${COMPONENT_NAME}/src/ --component-filepattern ${COMPONENT_NAME}.py --no-push-image --no-build-image
+uv run kfp component build ${COMPONENT_NAME}/src/ --component-filepattern ${COMPONENT_NAME}.py --no-push-image --no-build-image
 
 # Build the image using the BASE_IMAGE build arg
 podman build -t ${COMPONENT_NAME}:${TAG} -f ./Containerfile . \
