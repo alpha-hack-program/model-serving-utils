@@ -1,51 +1,51 @@
-from cProfile import label
 from kubernetes import client as k8s_cli, config as k8s_conf
 
-# Function that gets the model registry endpoint using a route object
-def get_model_registry_endpoint(model_registry_name: str,
-                                namespace: str) -> str:
+
+def get_model_registry_endpoint(model_registry_name: str, namespace: str) -> str | None:
     """
-    Get the model registry endpoint from the route object in the specified namespace.
+    Get the model registry REST endpoint from the route in the specified namespace.
+
+    Uses label selectors matching OpenShift AI / ODH model registry operator patterns:
+    - app.kubernetes.io/name={name} (ModelRegistry CR name)
+    - app.kubernetes.io/instance={name} or {name}-http or {name}-users (route variants)
+
     Args:
-        model_registry_name (str): Name of the model registry
-        namespace (str): Namespace where the model registry route is located
+        model_registry_name: Name of the model registry (e.g. model-registry-dev)
+        namespace: Namespace where the model registry is located (e.g. rhoai-model-registries)
+
     Returns:
-        str: The model registry endpoint URL if found, otherwise None
+        The model registry endpoint URL (http:// or https://) if found, otherwise None.
     """
-    print(f"Retrieving model registry endpoint for {model_registry_name} in namespace {namespace}")
-    # Load in-cluster Kubernetes configuration but if it fails, load local configuration
     try:
         k8s_conf.load_incluster_config()
     except k8s_conf.config_exception.ConfigException:
         k8s_conf.load_kube_config()
 
-    # Create Kubernetes API client
-    api_instance = k8s_cli.CustomObjectsApi()
+    api = k8s_cli.CustomObjectsApi()
+    label_namespace_pairs = [
+        (f"app.kubernetes.io/name={model_registry_name}", namespace),
+        (f"app.kubernetes.io/instance={model_registry_name}", namespace),
+        (f"app.kubernetes.io/instance={model_registry_name}-http", namespace),
+        (f"app.kubernetes.io/instance={model_registry_name}-users", namespace),
+        (f"app.kubernetes.io/instance={model_registry_name}", "istio-system"),
+        (f"app.kubernetes.io/instance={model_registry_name}-users", "istio-system"),
+    ]
 
-    # Selector to find the route by app label
-    label_selector = f"app.kubernetes.io/name={model_registry_name}"
-    print(f"Using label selector: {label_selector}")
+    for label_selector, ns in label_namespace_pairs:
+        try:
+            routes = api.list_namespaced_custom_object(
+                group="route.openshift.io",
+                version="v1",
+                namespace=ns,
+                plural="routes",
+                label_selector=label_selector,
+            )
+            for route in routes.get("items", []):
+                host = route.get("spec", {}).get("host", "")
+                if "-rest" in host or "-http" in host:
+                    scheme = "https" if route.get("spec", {}).get("tls") else "http"
+                    return f"{scheme}://{host}"
+        except Exception:
+            continue
 
-    try:
-        # Retrieve the route object
-        routes = api_instance.list_namespaced_custom_object(
-            group="route.openshift.io",
-            version="v1",
-            namespace=namespace,
-            plural="routes",
-            label_selector=label_selector
-        )
-
-        # Extract spec.host fields
-        route_hosts = [route['spec']['host'] for route in routes['items']]
-        print(f"Found route hosts: {route_hosts}")
-
-        # Return the route host only if it contains "-http" else return None
-        for route_host in route_hosts:
-            if "-rest" in route_host:
-                return f'https://{route_host}'
-        return None
-    
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
+    return None

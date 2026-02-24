@@ -9,5 +9,5 @@ dependencies = [
     "kfp[kubernetes]==2.13.0",
     "kubernetes==23.6.0",
     "load-dotenv==0.1.0",
-    "model-registry==0.2.21",
+    "model-registry==0.3.6",
 ]

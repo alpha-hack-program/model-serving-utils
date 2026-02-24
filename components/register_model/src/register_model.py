@@ -120,8 +120,22 @@ def _register_model(
     _log.info(f"Metadata: {metadata}")
 
     # Create the model registry object
+    # ModelRegistry requires is_secure=False and port=80 for HTTP (no TLS) routes
     _log.info("Creating model registry client...")
-    registry = ModelRegistry(model_registry_endpoint, author="register_model", user_token=get_token())
+    if model_registry_endpoint.startswith("http://"):
+        registry = ModelRegistry(
+            model_registry_endpoint,
+            80,
+            author="register_model",
+            is_secure=False,
+            user_token=get_token(),
+        )
+    else:
+        registry = ModelRegistry(
+            model_registry_endpoint,
+            author="register_model",
+            user_token=get_token(),
+        )
 
     # Register the model
     _log.info(f"Registering model '{model_name}' version '{model_version}'...")

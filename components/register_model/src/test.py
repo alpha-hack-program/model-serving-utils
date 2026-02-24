@@ -97,10 +97,25 @@ def main():
         '--labels',
         required=False,
         default='{}',
-        help='Labels for the model as a JSON string'
+        help='Labels for the model as JSON (e.g. {"type":"vision"}) or key=value pairs (e.g. type=vision,accuracy=0.9)'
     )
 
     args = parser.parse_args()
+
+    # Parse labels: accept JSON or key=value,key=value format
+    labels_str = args.labels
+    if labels_str and labels_str.strip():
+        try:
+            json.loads(labels_str)
+        except json.JSONDecodeError:
+            # Parse key=value,key=value format
+            labels_dict = {}
+            for pair in labels_str.split(','):
+                pair = pair.strip()
+                if '=' in pair:
+                    k, v = pair.split('=', 1)
+                    labels_dict[k.strip()] = v.strip()
+            args.labels = json.dumps(labels_dict)
 
     print(f"Model registry name: {args.model_registry_name}")
     print(f"Istio system namespace: {args.model_registry_namespace}")
