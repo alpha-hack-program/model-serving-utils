@@ -61,7 +61,7 @@ deploymentSpec:
         - python3
         - -m
         - kfp.dsl.executor_main
-        image: quay.io/atarazana/register_model:v1.0.5
+        image: quay.io/atarazana/register_model:v1.0.6
 pipelineInfo:
   name: register-model
 root:

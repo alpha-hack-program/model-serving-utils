@@ -21,6 +21,13 @@ echo "BASE_IMAGE: ${BASE_IMAGE}"
 echo "REGISTRY: ${REGISTRY}"
 echo "TAG: ${TAG}"
 
+# Mount kubeconfig so oc/kubectl work inside the container
+KUBECONFIG_PATH=${KUBECONFIG:-$HOME/.kube/config}
+MOUNT_ARGS=()
+if [ -n "$KUBECONFIG_PATH" ] && [ -f "${KUBECONFIG_PATH%%:*}" ]; then
+  MOUNT_ARGS=(-v "${KUBECONFIG_PATH%%:*}:/tmp/kubeconfig:ro" -e KUBECONFIG=/tmp/kubeconfig)
+fi
+
 # Run the component image
-podman run -it --rm localhost/${COMPONENT_NAME}:${TAG} bash
+podman run -it --rm "${MOUNT_ARGS[@]}" localhost/${COMPONENT_NAME}:${TAG} bash
 # podman run -it --rm --entrypoint bash localhost/${COMPONENT_NAME}:latest 

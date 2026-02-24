@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Set PYTHONPATH to the components directory (parent of both shared and register_model)
-export PYTHONPATH=$(cd "$(dirname "$0")"/../../ && pwd)
+# Set PYTHONPATH: script dir for container (shared/ is sibling); ../../ for host (shared/ is in components/)
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+export PYTHONPATH=$([ -d "$SCRIPT_DIR/shared" ] && echo "$SCRIPT_DIR" || echo "$SCRIPT_DIR:$(cd "$SCRIPT_DIR/../.." && pwd)")
 
 # Set default environment variables for model registration (OpenShift AI default)
 export MODEL_REGISTRY_NAME=${MODEL_REGISTRY_NAME:-"model-registry-dev"}

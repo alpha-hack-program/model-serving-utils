@@ -1,4 +1,5 @@
-kfp[kubernetes]==2.8.0
+kfp==2.13.0
+kfp[kubernetes]==2.13.0
 model_registry==0.3.6
 kubernetes==23.6.0
 load_dotenv==0.1.0

@@ -9,11 +9,15 @@ ARG COMPONENT_NAME
 
 WORKDIR /usr/local/src/kfp/components
 
-COPY ${COMPONENT_NAME}/src/runtime-requirements.txt runtime-requirements.txt
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-RUN pip install --no-cache-dir -r runtime-requirements.txt
-RUN pip install --no-cache-dir kfp==2.13.0
+# Install dependencies into the base image's default Python (/opt/app-root/bin/python)
+COPY ${COMPONENT_NAME}/requirements.txt component-requirements.txt
+USER root
+RUN uv pip install -r component-requirements.txt --python /opt/app-root/bin/python
 
+# Copy component source and shared
 COPY ${COMPONENT_NAME}/src/ .
 COPY shared ./shared
 
